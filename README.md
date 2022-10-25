@@ -12,7 +12,24 @@ git clone https://github.com/amirHossein5/git-backup.git
 
 ## Configuration
 
-First you need to create a json configuration for git-backup, [see stubs]().
+First of all you need to create a json configuration for your backup items, [see configuration stubs]().
+
+The base of configuration:
+
+```json
+{
+    "items": [
+        {
+            ...
+        }
+    ]
+}
+```
+
+### CONFIGS
+
+| config | required or optional |
+| ------ | -------------------- |
 
 ## Commands
 

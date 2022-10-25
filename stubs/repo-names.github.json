@@ -1,0 +1,6 @@
+{
+    "repo-names": {
+        "from-api": "https://api.github.com/search/repositories?q=user:amirhossein5",
+        "pattern": "items.*.name"
+    }
+}
