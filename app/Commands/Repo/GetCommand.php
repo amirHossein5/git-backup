@@ -8,12 +8,15 @@ use App\Exceptions\JsonDecodeException;
 use App\Exceptions\RequiredKeyMissing;
 use App\Services\ConfigReader;
 use App\Services\RepositoryManager;
+use App\Traits\HasForcedOptions;
 use Illuminate\Support\Collection;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
 
 class GetCommand extends Command
 {
+    use HasForcedOptions;
+
     /**
      * The signature of the command.
      *
@@ -38,7 +41,7 @@ class GetCommand extends Command
      */
     public function handle()
     {
-        if (! $this->checkForcedOptions()) {
+        if (! $this->hasAllOptions('config')) {
             return Output::FAILURE;
         }
 
@@ -152,17 +155,6 @@ class GetCommand extends Command
         }
 
         return $config;
-    }
-
-    private function checkForcedOptions(): bool
-    {
-        if (! $this->option('config')) {
-            $this->error('Specify config file via --config=path/to/config');
-
-            return false;
-        }
-
-        return true;
     }
 
     private function getRepoNames($data): bool|Collection
