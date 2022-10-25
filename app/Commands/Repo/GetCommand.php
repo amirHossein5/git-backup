@@ -21,7 +21,7 @@ class GetCommand extends Command
      */
     protected $signature = 'repo:get
         {--config=}
-        {--matches= : Search servers based on specified name}
+        {--matches= : Filter servers based on specified name}
     ';
 
     /**
