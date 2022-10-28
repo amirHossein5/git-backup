@@ -24,6 +24,7 @@ class GetCommand extends Command
      */
     protected $signature = 'repo:get
         {--config=}
+        {--repo-matches= : Filters repos.}
         {--matches= : Filter servers based on specified name}
     ';
 
@@ -81,7 +82,16 @@ class GetCommand extends Command
                 "<comment>{$data['name']}</comment> "
             );
 
-            if(! $repoNames = $this->getRepoNames($data['repo-names'])) {
+            $repoNames = $this->getRepoNames($data['repo-names']);
+
+            if ($repoMatches = $this->option('repo-matches')) {
+                $repoNames = collect($repoNames)
+                    ->filter(
+                        fn ($repo) => str($repo)->contains($repoMatches)
+                    );
+            }
+
+            if(! $repoNames) {
                 return Output::FAILURE;
             }
 

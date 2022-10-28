@@ -28,9 +28,7 @@ class ConfigReader
 
     public static function read(string $jsonContent): ConfigReader
     {
-        if (! $decodedJson = json_decode($jsonContent, true)) {
-            throw new JsonDecodeException(json_last_error_msg());
-        }
+        $decodedJson = JsonDecoder::decode($jsonContent);
 
         $decodedJson = self::wrapUse($decodedJson);
 
