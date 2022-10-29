@@ -10,7 +10,7 @@ trait HasForcedOptions
     {
         $options = Arr::flatten($options);
 
-        foreach($options as $option) {
+        foreach ($options as $option) {
             if (! $this->option($option)) {
                 $this->error("Option --{$option} is required.");
 

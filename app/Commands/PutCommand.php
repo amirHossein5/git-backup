@@ -7,20 +7,19 @@ use App\Services\DiskManager;
 use App\Services\FileManager;
 use App\Services\JsonDecoder;
 use App\Traits\HasForcedOptions;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Storage;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class PutCommand extends Command
 {
     use HasForcedOptions;
 
     private ProgressBar $progressBar;
+
     private string $dirPathWillBe;
+
     private string $disk;
 
     /**
@@ -65,18 +64,21 @@ class PutCommand extends Command
 
         if (! is_dir($dirPath)) {
             $this->error("Directory not found {$dirPath}");
+
             return Output::FAILURE;
         }
 
         if (! config("filesystems.disks.{$disk}")) {
             $this->error("disk {$disk} not found.");
             $this->line("See available disk list via, {$showDiskCommand}");
+
             return Output::FAILURE;
         }
 
         if ($tokensPath = $this->option('disk-tokens')) {
             if (! file_exists($tokensPath)) {
                 $this->error('File not found at: '.$tokensPath);
+
                 return Output::FAILURE;
             }
 
@@ -85,6 +87,7 @@ class PutCommand extends Command
             } catch (JsonDecodeException $e) {
                 $this->error('Error when decoding json:');
                 $this->error($e->getMessage());
+
                 return Output::FAILURE;
             }
 
@@ -95,14 +98,14 @@ class PutCommand extends Command
         $this->info('Checking disk...');
 
         if (Storage::disk($disk)->exists($dirPathWillBe)) {
-            $this->error('Directory '. $dirPathWillBe .' exists in disk: '. $disk);
+            $this->error('Directory '.$dirPathWillBe.' exists in disk: '.$disk);
 
             if ($this->confirm('Do you want to delete '.$dirPathWillBe.' ?')) {
-                $this->task("Deleted {$dirPathWillBe}" , fn () =>
-                    Storage::disk($disk)->deleteDirectory($dirPathWillBe)
+                $this->task("Deleted {$dirPathWillBe}", fn () => Storage::disk($disk)->deleteDirectory($dirPathWillBe)
                 );
 
                 $this->info('run command again.');
+
                 return Output::SUCCESS;
             }
 
@@ -115,12 +118,13 @@ class PutCommand extends Command
         $this->newLine();
 
         if ($countSteps === 0) {
-            $this->error($dirPath." Does not have any file or folder.");
+            $this->error($dirPath.' Does not have any file or folder.');
+
             return Output::FAILURE;
         }
 
         $this->progressBar = $this->editProgressBar($countSteps);
-        $this->progressBar->setMessage("<info>Loading...</info>");
+        $this->progressBar->setMessage('<info>Loading...</info>');
         $this->progressBar->start();
 
         $this->uploadFolder($dirPath, $dirPath);
@@ -172,7 +176,7 @@ class PutCommand extends Command
             $this->progressBar->advance();
         }
 
-        foreach($allFiles as $file) {
+        foreach ($allFiles as $file) {
             $readableFile = (string) str($file)->replace($baseDirPath, basename($baseDirPath));
             $this->progressBar->setMessage("Uploading <comment>$readableFile</comment>");
 
@@ -189,7 +193,7 @@ class PutCommand extends Command
             $this->progressBar->advance();
         }
 
-        foreach($allDirs as $dir) {
+        foreach ($allDirs as $dir) {
             $this->uploadFolder($dir, $baseDirPath);
         }
     }
@@ -198,6 +202,7 @@ class PutCommand extends Command
     {
         $progressBar = new ProgressBar($this->output, $len);
         $progressBar->setFormat(' %current%/%max%  %percent:3s%%    (%elapsed:6s%/%estimated:-6s%)'.PHP_EOL.' %message%');
+
         return $progressBar;
     }
 

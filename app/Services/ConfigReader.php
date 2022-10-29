@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Exceptions\FileNotFoundException;
-use App\Exceptions\JsonDecodeException;
 use App\Exceptions\RequiredKeyMissing;
+use Illuminate\Support\Arr;
 
 class ConfigReader
 {
@@ -18,27 +17,28 @@ class ConfigReader
      * If key is missing value(s) are required, in servers scope(key).
      */
     private static array $requiredIfMissingInServers = [
-        "repo-names.names" => [
-            "repo-names.from-api",
-            "repo-names.pattern",
+        'repo-names.names' => [
+            'repo-names.from-api',
+            'repo-names.pattern',
         ],
     ];
 
-    public function __construct(private array $config) {}
+    public function __construct(private array $config)
+    {
+    }
 
     public static function read(string $jsonContent): ConfigReader
     {
         $decodedJson = JsonDecoder::decode($jsonContent);
 
-        $decodedJson = self::wrapUse($decodedJson);
+        $decodedJson = self::resolveUse($decodedJson);
 
-        collect(self::$requiredKeys)->each(function($forceKey) use ($decodedJson) {
+        collect(self::$requiredKeys)->each(function ($forceKey) use ($decodedJson) {
             self::throwExceptionIfKeyDoesNotExist($decodedJson, $forceKey, count($decodedJson['servers']));
         });
 
-        collect(self::$requiredIfMissingInServers)->each(function($requiredKeys, $key) use ($decodedJson) {
-
-            foreach($decodedJson['servers'] as $server) {
+        collect(self::$requiredIfMissingInServers)->each(function ($requiredKeys, $key) use ($decodedJson) {
+            foreach ($decodedJson['servers'] as $server) {
                 $searchForKey = collect(data_get($server, $key))->filter();
 
                 if ($searchForKey->count() !== 0) {
@@ -49,7 +49,6 @@ class ConfigReader
                     self::throwExceptionIfKeyDoesNotExist($server, $requiredKey, 1);
                 }
             }
-
         });
 
         return new ConfigReader(self::getTranslatedConfig($decodedJson));
@@ -65,44 +64,64 @@ class ConfigReader
         $this->config['servers'] = $servers;
     }
 
-    private static function wrapUse(array $decodedJson): array
+    private static function resolveUse(array $decodedJson)
     {
-        $decodedJson = self::wrapUseInServerRepoNames($decodedJson);
+        $arrayDot = Arr::dot($decodedJson);
 
-        return $decodedJson;
-    }
+        $useKeys = collect($arrayDot)->filter(fn ($value, $key) => str($key)->explode('.')->filter(fn ($v) => $v === 'use')->count() === 1 &&
+            str($key)->explode('.')->contains('use') ||
+            str($key)->endsWith('use.from') ||
+            str($key)->contains('use.with')
+        );
 
-    private static function wrapUseInServerRepoNames(array $decodedJson): array
-    {
-        foreach($decodedJson['servers'] as $serverKey => $server) {
-            if (! isset($server['repo-names']['use'])) {
+        foreach ($useKeys as $useKey => $value) {
+            if (str($useKey)->contains('use.with')) {
                 continue;
             }
 
-            if (! file_exists($server['repo-names']['use'])) {
-                throw new FileNotFoundException('file not found: '.$server['repo-names']['use']);
+            $decodedUse = Arr::dot(JsonDecoder::decodePath($value));
+            $varKey = (string) str($useKey)->replace('use.from', 'use.with');
+
+            $vars = $useKeys->filter(fn ($val, $key) => str($key)->contains($varKey));
+
+            foreach ($vars->toArray() as $key => $val) {
+                unset($arrayDot[$key]);
             }
 
-            if (is_dir($server['repo-names']['use'])) {
-                throw new \Exception('Use must be json file not directory: '.$server['repo-names']['use']);
+            if ($vars->isNotEmpty()) {
+                $vars = $vars->mapWithKeys(fn ($val, $key) => [str_replace($varKey.'.', '', $key) => $val]
+                )->toArray();
+
+                $decodedUse = self::resolveVars(with: $vars, in: $decodedUse);
             }
 
-            if (! $useArray = json_decode(file_get_contents($server['repo-names']['use']), true)) {
-                throw new JsonDecodeException(json_last_error_msg());
-            }
+            foreach ($decodedUse as $key => $value) {
+                $generatedKey = str($useKey)->replace('use'.str($useKey)->after('use'), '').$key;
 
-            foreach($useArray['repo-names'] as $key => $item) {
-                if (isset($server['repo-names'][$key])) {
-                    continue;
+                if (! isset($arrayDot[$generatedKey])) {
+                    $arrayDot[$generatedKey] = $value;
                 }
-
-                $decodedJson['servers'][$serverKey]['repo-names'][$key] = $item;
             }
 
-            unset($decodedJson['servers'][$serverKey]['repo-names']['use']);
+            unset($arrayDot[$useKey]);
         }
 
-        return $decodedJson;
+        return Arr::undot($arrayDot);
+    }
+
+    private static function resolveVars(array $with, array $in, string $varStart = '-', string $varEnd = '-'): array
+    {
+        $in = Arr::dot($in);
+
+        foreach ($with as $var => $varValue) {
+            foreach ($in as $key => $value) {
+                if (str($value)->contains("{$varStart}{$var}{$varEnd}")) {
+                    $in[$key] = str($value)->replace("{$varStart}{$var}{$varEnd}", $varValue)->value;
+                }
+            }
+        }
+
+        return $in;
     }
 
     private static function throwExceptionIfKeyDoesNotExist(array $array, string $requiredKey, int $expectedCount): void
@@ -117,6 +136,7 @@ class ConfigReader
 
     /**
      * Translates the user given infos to program intended keys.
+     *
      * @param  array  $servers
      * @return array
      */
@@ -124,18 +144,18 @@ class ConfigReader
     {
         $config = ['servers' => []];
 
-        collect($decodedJson['servers'])->each(function($server) use (&$config) {
+        collect($decodedJson['servers'])->each(function ($server) use (&$config) {
             $config['servers'][] = [
-                "name" => $server['name'],
-                "clone" => [
-                    "to" => $server['clone']['to'],
-                    "using" => $server['clone']['using'],
+                'name' => $server['name'],
+                'clone' => [
+                    'to' => $server['clone']['to'],
+                    'using' => $server['clone']['using'],
                 ],
-                "repo-names" => [
-                    "from-api" => isset($server['repo-names']['from-api']) ? $server['repo-names']['from-api'] : null,
-                    "pattern"  => isset($server['repo-names']['pattern']) ? $server['repo-names']['pattern'] : null,
-                    "names"    => isset($server['repo-names']['names']) ? $server['repo-names']['names'] : null,
-                    "token"    => isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null,
+                'repo-names' => [
+                    'from-api' => isset($server['repo-names']['from-api']) ? $server['repo-names']['from-api'] : null,
+                    'pattern' => isset($server['repo-names']['pattern']) ? $server['repo-names']['pattern'] : null,
+                    'names' => isset($server['repo-names']['names']) ? $server['repo-names']['names'] : null,
+                    'token' => isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null,
                 ],
             ];
         });

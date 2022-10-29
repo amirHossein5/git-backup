@@ -10,5 +10,6 @@ function getArtisanCommand(string $command): string
     if (config('app.env') === 'production') {
         return './builds/backup '.$command;
     }
+
     return 'php backup '.$command;
 }

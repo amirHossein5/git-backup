@@ -4,7 +4,6 @@ namespace App\Commands\Repo;
 
 use App\Services\RepositoryManager;
 use App\Traits\HasForcedOptions;
-use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
 
@@ -68,13 +67,13 @@ class AddCommand extends Command
 
         if ($this->option('fetch-branches') === 'true') {
             if (RepositoryManager::hasAnyBranches($repoPath)) {
-                $this->info('Getting/Fetching all remote branches of <comment>'. basename($repoPath).'</comment>...');
+                $this->info('Getting/Fetching all remote branches of <comment>'.basename($repoPath).'</comment>...');
                 RepositoryManager::fetchAllBranches($repoPath);
                 $this->newLine();
             }
         }
 
-        $this->info('Cloning <comment>'. basename($repoPath).'</comment> to '. $repoPathWillBe);
+        $this->info('Cloning <comment>'.basename($repoPath).'</comment> to '.$repoPathWillBe);
         RepositoryManager::clone($toDir, "git clone --mirror {$repoPath}", afterNewLine: false);
 
         return Output::SUCCESS;

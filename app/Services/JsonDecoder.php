@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\FileNotFoundException;
 use App\Exceptions\JsonDecodeException;
 
 class JsonDecoder
@@ -13,5 +14,19 @@ class JsonDecoder
         }
 
         return $decodedJson;
+    }
+
+    public static function decodePath(string $path): array
+    {
+        if (is_dir($path)) {
+            throw new \Exception("{$path} Is directory not json file.");
+        }
+        if (! file_exists($path)) {
+            throw new FileNotFoundException("File not found: {$path}");
+        }
+
+        $json = file_get_contents($path);
+
+        return JsonDecoder::decode($json);
     }
 }

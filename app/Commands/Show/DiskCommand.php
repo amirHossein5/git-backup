@@ -2,7 +2,6 @@
 
 namespace App\Commands\Show;
 
-use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
 

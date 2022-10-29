@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Collection;
-
 class FileManager
 {
     /**
      * Returns all (not nested) files of directory.
-     * @param  string $dir
+     *
+     * @param  string  $dir
      * @return array
      */
     public static function allFiles(string $dir): array
@@ -21,12 +20,13 @@ class FileManager
         unset($ffs[array_search('..', $ffs, true)]);
 
         // prevent empty ordered elements
-        if (count($ffs) < 1)
+        if (count($ffs) < 1) {
             return [];
+        }
 
         $allFiles = [];
 
-        foreach($ffs as $ff){
+        foreach ($ffs as $ff) {
             $ff = $dir.DIRECTORY_SEPARATOR.$ff;
 
             if (! is_dir($ff) and file_exists($ff)) {
@@ -39,7 +39,8 @@ class FileManager
 
     /**
      * Returns all (not nested) directories of directory.
-     * @param  string $dir
+     *
+     * @param  string  $dir
      * @return array
      */
     public static function allDir(string $dir): array
@@ -52,12 +53,13 @@ class FileManager
         unset($ffs[array_search('..', $ffs, true)]);
 
         // prevent empty ordered elements
-        if (count($ffs) < 1)
+        if (count($ffs) < 1) {
             return [];
+        }
 
         $allFolders = [];
 
-        foreach($ffs as $ff){
+        foreach ($ffs as $ff) {
             $ff = $dir.DIRECTORY_SEPARATOR.$ff;
 
             if (is_dir($ff) and file_exists($ff)) {
@@ -87,7 +89,7 @@ class FileManager
 
         foreach (FileManager::allDir($dirPath) as $dir) {
             if (count(FileManager::allFiles($dir)) === 0 and count(FileManager::allDir($dir)) === 0) {
-                $count ++;
+                $count++;
             } else {
                 $count += FileManager::countNestedEmptyFolders($dir);
             }

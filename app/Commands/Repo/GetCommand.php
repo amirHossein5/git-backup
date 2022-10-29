@@ -3,7 +3,6 @@
 namespace App\Commands\Repo;
 
 use App\Exceptions\FileNotFoundException;
-use App\Exceptions\InvalidArgumentException;
 use App\Exceptions\JsonDecodeException;
 use App\Exceptions\RequiredKeyMissing;
 use App\Services\ConfigReader;
@@ -49,7 +48,7 @@ class GetCommand extends Command
         $configPath = $this->option('config');
 
         if (! file_exists($configPath)) {
-           $this->error("Counld'nt find config file in path: ".$configPath);
+            $this->error("Counld'nt find config file in path: ".$configPath);
 
             return Output::FAILURE;
         }
@@ -91,7 +90,7 @@ class GetCommand extends Command
                     );
             }
 
-            if(! $repoNames) {
+            if (! $repoNames) {
                 return Output::FAILURE;
             }
 
@@ -107,7 +106,7 @@ class GetCommand extends Command
             $this->newLine();
 
             if (! is_dir($data['clone']['to'])) {
-                $this->error("Directory not found: ".$data['clone']['to']);
+                $this->error('Directory not found: '.$data['clone']['to']);
 
                 continue;
             }
@@ -151,7 +150,7 @@ class GetCommand extends Command
 
             return false;
         } catch (RequiredKeyMissing $e) {
-            $this->error('required config key '. $e->getMessage() .' missing.');
+            $this->error('required config key '.$e->getMessage().' missing.');
 
             return false;
         } catch (FileNotFoundException $e) {
