@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Services\RepositoryManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
@@ -12,26 +11,25 @@ class RepositoryManager
     {
         $command = self::getCommandToSeeAllBranches();
 
-        exec("cd {$repoPath}; {$command} 2>&1", $output);
+        exec("cd {$repoPath} && {$command} 2>&1", $output);
 
         return count($output) !== 0;
     }
 
     public static function filterServersBy(array $servers, string $matches): array
     {
-        return collect($servers)->filter(fn ($server) =>
-            str($server['name'])->contains($matches)
+        return collect($servers)->filter(fn ($server) => str($server['name'])->contains($matches)
         )->toArray();
     }
 
     public static function fetchAllBranches(string $repoPath): void
     {
-        system("cd {$repoPath}; git fetch --all; git pull --all;". self::getCommandToFetchAllBranches());
+        system("cd {$repoPath} && git fetch --all; git pull --all;".self::getCommandToFetchAllBranches());
     }
 
     public static function isGitRepo(string $dir): bool
     {
-        exec("cd {$dir}; git status 2>&1", $output);
+        exec("cd {$dir} && git status 2>&1", $output);
 
         return str($output[0])->contains('On branch');
     }
@@ -47,7 +45,7 @@ class RepositoryManager
         return collect();
     }
 
-    public static function getRepoNamesFromApi(string $url, null|string $token = null, string $pattern="*.name"): Collection
+    public static function getRepoNamesFromApi(string $url, null|string $token = null, string $pattern = '*.name'): Collection
     {
         $http = Http::acceptJson();
 
@@ -59,10 +57,10 @@ class RepositoryManager
 
         if ($response->failed()) {
             $message = isset($response->json()['message'])
-                ? "Message: ".$response->json()['message']
+                ? 'Message: '.$response->json()['message']
                 : null;
 
-            throw new \Exception("Request failed with status code: ". $response->status().". ". $message);
+            throw new \Exception('Request failed with status code: '.$response->status().'. '.$message);
         }
 
         return collect(data_get($response->json(), $pattern))->filter();
@@ -70,10 +68,10 @@ class RepositoryManager
 
     public static function clone(string $cloneTo, string $gitCloneCommand, bool $afterNewLine = true): void
     {
-        $command = "cd {$cloneTo}; ";
+        $command = "cd {$cloneTo} && ";
 
         if ($afterNewLine) {
-            $command .= "echo; ";
+            $command .= 'echo; ';
         }
 
         system($command.$gitCloneCommand);
@@ -81,7 +79,7 @@ class RepositoryManager
 
     public static function fetch(string $dir): Collection
     {
-        exec("cd {$dir}; git fetch 2>&1", $output);
+        exec("cd {$dir} && git fetch 2>&1", $output);
 
         return collect($output);
     }
