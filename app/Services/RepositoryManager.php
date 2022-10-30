@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Traits\RepositoryManagerStats;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
 class RepositoryManager
 {
+    use RepositoryManagerStats;
+
     public static function hasAnyBranches(string $repoPath): bool
     {
         $command = self::getCommandToSeeAllBranches();
@@ -24,6 +27,8 @@ class RepositoryManager
 
     public static function fetchAllBranches(string $repoPath): void
     {
+        self::addFetchedAllBranchesOfRepos($repoPath);
+
         system("cd {$repoPath} && git fetch --all; git pull --all;".self::getCommandToFetchAllBranches());
     }
 
@@ -75,11 +80,15 @@ class RepositoryManager
         }
 
         system($command.$gitCloneCommand);
+
+        self::addClonedReposTo($cloneTo);
     }
 
     public static function fetch(string $dir): Collection
     {
         exec("cd {$dir} && git fetch 2>&1", $output);
+
+        self::addFetchedRepos($dir);
 
         return collect($output);
     }

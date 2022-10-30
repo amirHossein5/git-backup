@@ -81,6 +81,11 @@ class PutCommand extends Command
 
                 return Output::FAILURE;
             }
+            if (is_dir($tokensPath)) {
+                $this->error('Disk tokens should be json file not directory: '.$tokensPath);
+
+                return Output::FAILURE;
+            }
 
             try {
                 $tokens = JsonDecoder::decode(file_get_contents($tokensPath));
@@ -97,7 +102,14 @@ class PutCommand extends Command
         $this->newLine();
         $this->info('Checking disk...');
 
-        if (Storage::disk($disk)->exists($dirPathWillBe)) {
+        try {
+            $exists = Storage::disk($disk)->exists($dirPathWillBe);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+            return Output::FAILURE;
+        }
+
+        if ($exists) {
             $this->error('Directory '.$dirPathWillBe.' exists in disk: '.$disk);
 
             if ($this->confirm('Do you want to delete '.$dirPathWillBe.' ?')) {
@@ -127,7 +139,12 @@ class PutCommand extends Command
         $this->progressBar->setMessage('<info>Loading...</info>');
         $this->progressBar->start();
 
-        $this->uploadFolder($dirPath, $dirPath);
+        try {
+            $this->uploadFolder($dirPath, $dirPath);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+            return Output::FAILURE;
+        }
 
         $this->progressBar->setMessage('');
         $this->progressBar->finish();
@@ -187,7 +204,7 @@ class PutCommand extends Command
 
             $this->failWhen(
                 ! Storage::disk($this->disk)->put($filePath, file_get_contents($file)),
-                "Failed to upload file to disk path {$filePath}"
+                "Counldn't create directory in disk path {$filePath}. Check your connection, or set disk authorization tokens."
             );
 
             $this->progressBar->advance();

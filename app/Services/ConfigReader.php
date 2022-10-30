@@ -59,6 +59,11 @@ class ConfigReader
         return $this->config['servers'];
     }
 
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
     public function setServers(array $servers): void
     {
         $this->config['servers'] = $servers;

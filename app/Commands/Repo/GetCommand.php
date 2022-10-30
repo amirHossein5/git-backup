@@ -78,7 +78,7 @@ class GetCommand extends Command
             $this->newLine();
             $this->info(
                 'Collecting repository names for: '.
-                "<comment>{$data['name']}</comment> "
+                "<comment>{$data['name']}</comment>"
             );
 
             $repoNames = $this->getRepoNames($data['repo-names']);
@@ -112,9 +112,13 @@ class GetCommand extends Command
             }
 
             $this->withProgressBar($repoNames, function ($repoName) use ($data) {
+                $repoName = str($repoName)->endsWith('.git')
+                    ? $repoName
+                    : $repoName.'.git';
+
                 $output = RepositoryManager::cloneOrFetch(
                     $data['clone']['to'],
-                    $repoName.'.git',
+                    $repoName,
                     str("git clone --mirror {$data['clone']['using']}")->replace('<repo>', $repoName)
                 );
 
