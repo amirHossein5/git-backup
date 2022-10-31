@@ -55,7 +55,7 @@ For putting some **directory** to a [disk](#show-disk-command), run:
 ./builds/backup put --dir=/path/upload-dir --disk=disk-name
 ```
 
--   It will upload to specified disk, with path `upload-dir/`(passed directory name). [Specify destination path](#specifying-destination-path).
+-   It will upload to specified disk, with path `upload-dir/`(passed directory name). Unless [specify destination path](#specifying-destination-path).
 -   `--dir` is directory which you want to upload.
 -   For option `--disk`, pass the name of disk. [See available disks](#show-disk-command).
 
@@ -138,7 +138,7 @@ Each server needs a name, a path that repos be clone there, git clone command, r
 
 If you are using github easily [use](#use-keyword):
 
-```json
+```diff
 "repo-names": {
 -   "names": ["reponame", "anothername"]
 +   "use": {
@@ -154,7 +154,7 @@ If you are using github easily [use](#use-keyword):
 
 For getting repository names from api, you can define a api url, with a pattern to get repository names from response of api:
 
-```json
+```diff
 "repo-names": {
 -   "names": ["reponame", "anothername"]
 +   "from-api": "https://api.github.com/search/repositories?q=user:yourusername",
@@ -163,7 +163,7 @@ For getting repository names from api, you can define a api url, with a pattern 
 }
 ```
 
-`"pattern": "items.*.name"` means:
+`"pattern": "items.*.name"` based on api response means:
 
 ```php
 [
@@ -188,12 +188,11 @@ for example if you `use` in `config.json` file:
 
 ```json
 {
-    //...
+    // ...
     {
         "name": "some name",
         "use": "path/to/file.json"
     }
-    //...
 }
 ```
 
@@ -214,7 +213,7 @@ e.g, file `path/to/file.json`:
 
 ```json
 {
-    //...
+    // ...
     {
         "name": "some name",
         "example": "new example",
@@ -223,7 +222,6 @@ e.g, file `path/to/file.json`:
             "second": "second"
         }
     }
-    //...
 }
 ```
 
@@ -246,7 +244,7 @@ file `path/to/file.json`:
 
 ```json
 {
-    //...
+    // ...
     {
         "use": {
             "from": "path/to/file.json",
@@ -256,7 +254,6 @@ file `path/to/file.json`:
             }
         }
     }
-    //...
 }
 ```
 
@@ -264,14 +261,13 @@ file `path/to/file.json`:
 
 ```json
 {
-    //...
+    // ...
     {
         "clone": {
             "to": "clone/here",
             "using": "git@github.com:/amirhossein5/<repo>"
         }
     }
-    //...
 }
 ```
 
