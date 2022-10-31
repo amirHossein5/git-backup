@@ -20,8 +20,8 @@ abstract class TestCase extends BaseTestCase
             ...config('filesystems.disks'),
             'local' => [
                 'driver' => 'local',
-                'root' => base_path()
-            ]
+                'root' => base_path(),
+            ],
         ]]);
 
         $this->tempDirPath = pathable(base_path('tests/temp'));
@@ -55,4 +55,3 @@ abstract class TestCase extends BaseTestCase
         exec("cd {$dirPath}; git init 2>&1");
     }
 }
-

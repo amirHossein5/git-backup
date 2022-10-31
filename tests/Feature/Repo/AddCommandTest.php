@@ -102,4 +102,3 @@
 // it('won\'t fetch branches if false option passed');
 
 // it('clones repo to specified directory and fetches branches', function () {});
-

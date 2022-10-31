@@ -10,21 +10,21 @@ beforeEach(function () {
                 'name' => 'some name',
                 'clone' => [
                     'to' => 'some path',
-                    'using' => 'git c'
+                    'using' => 'git c',
                 ],
                 'repo-names' => [
                     'from-api' => null,
                     'pattern' => null,
                     'names' => 'a repo name',
                     'token' => null,
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ];
 });
 
 test('adds keys to array', function () {
-    Storage::disk('local')->put('tests/temp/config.json', <<<EOL
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
         "servers": [
             {
@@ -51,7 +51,7 @@ test('adds keys to array', function () {
 
     expect($config)->toMatchArray($this->expectedFinalOutput);
 
-   Storage::disk('local')->put('tests/temp/config.json', <<<EOL
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
         "name": "some name",
         "clone": {
@@ -82,7 +82,7 @@ test('adds keys to array', function () {
 test('adds keys to array, without rewriting previous ones', function () {
     $usePath = Storage::disk('local')->path('tests/temp/config.json');
 
-   Storage::disk('local')->put('tests/temp/config.json', <<<EOL
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
         "name": "new name",
         "clone": {
@@ -115,7 +115,7 @@ test('adds keys to array, without rewriting previous ones', function () {
 test('adds keys to array, with vars', function () {
     $usePath = Storage::disk('local')->path('tests/temp/config.json');
 
-   Storage::disk('local')->put('tests/temp/config.json', <<<EOL
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
         "name": "-serverName-",
         "clone": {
@@ -147,4 +147,3 @@ test('adds keys to array, with vars', function () {
 
     expect($config)->toMatchArray($this->expectedFinalOutput);
 });
-

@@ -14,13 +14,13 @@ it('has required options', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan('put --disk dropbox --dir=some/not/found/path')
-        ->expectsOutput("Directory not found some/not/found/path")
+        ->expectsOutput('Directory not found some/not/found/path')
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error when direcotry not found', function () {
     $this->artisan('put --disk dropbox --dir=some/not/found/path')
-        ->expectsOutput("Directory not found some/not/found/path")
+        ->expectsOutput('Directory not found some/not/found/path')
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -28,8 +28,8 @@ it('shows error when disk not found', function () {
     $dir = base_path();
 
     $this->artisan('put --disk notfound --dir='.$dir)
-        ->expectsOutput("disk notfound not found.")
-        ->expectsOutput("See available disk list via, php backup show:disk")
+        ->expectsOutput('disk notfound not found.')
+        ->expectsOutput('See available disk list via, php backup show:disk')
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -37,7 +37,7 @@ it('shows error when passed disk tokens not exists or is dir', function () {
     $dir = base_path();
 
     $this->artisan("put --disk local --disk-tokens /some/not/found --dir={$dir}")
-        ->expectsOutput("File not found at: /some/not/found")
+        ->expectsOutput('File not found at: /some/not/found')
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan("put --disk local --disk-tokens {$dir} --dir={$dir}")
@@ -48,22 +48,22 @@ it('shows error when passed disk tokens not exists or is dir', function () {
 it('shows error when could not decode disk tokens json', function () {
     $dir = base_path();
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
-    Storage::disk('local')->put('tests/temp/disk-tokens.json', "
+    Storage::disk('local')->put('tests/temp/disk-tokens.json', '
     {
         // invalid json
     }
-    ");
+    ');
 
     $this->artisan("put --disk local --disk-tokens {$diskTokensPath} --dir={$dir}")
-        ->expectsOutput("Error when decoding json:")
-        ->expectsOutput("Syntax error")
+        ->expectsOutput('Error when decoding json:')
+        ->expectsOutput('Syntax error')
         ->assertExitCode(Command::FAILURE);
 });
 
 it('sets disk tokens correctly', function () {
     $dir = base_path('stubs');
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
-    Storage::disk('local')->put('tests/temp/disk-tokens.json',<<<'EOT'
+    Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOT'
     {
         "notexists": "sometoken",
         "key": "somekey",
@@ -89,14 +89,14 @@ it('sets disk tokens correctly', function () {
     expect(isset($configArray['secret']))->toBeTrue();
 });
 
-it('shows confirmation to delete dir if already exists', function() {
+it('shows confirmation to delete dir if already exists', function () {
     $dir = base_path('stubs');
 
     $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Checking disk...")
-        ->expectsOutput("Directory tests/temp exists in disk: local")
-        ->expectsConfirmation("Do you want to delete tests/temp ?", 'no')
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Directory tests/temp exists in disk: local')
+        ->expectsConfirmation('Do you want to delete tests/temp ?', 'no')
         ->assertExitCode(Command::FAILURE);
 
     expect(Storage::disk('local')->directoryExists('tests/temp'))->toBeTrue();
@@ -107,11 +107,11 @@ it('deletes dir if confirmation for file already exists passed', function () {
 
     $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Checking disk...")
-        ->expectsOutput("Directory tests/temp exists in disk: local")
-        ->expectsConfirmation("Do you want to delete tests/temp ?", 'yes')
-        ->expectsOutput("Deleted tests/temp: ✔")
-        ->expectsOutput("run command again.")
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Directory tests/temp exists in disk: local')
+        ->expectsConfirmation('Do you want to delete tests/temp ?', 'yes')
+        ->expectsOutput('Deleted tests/temp: ✔')
+        ->expectsOutput('run command again.')
         ->assertExitCode(Command::SUCCESS);
 
     expect(Storage::disk('local')->directoryExists('tests/temp'))->not->toBeTrue();
@@ -124,7 +124,7 @@ it('shows error when dir does not have any file or folder', function () {
 
     $this->artisan("put --disk local --dir={$dir}")
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Checking disk...")
+        ->expectsOutput('Checking disk...')
         ->expectsOutput("Uploading to disk: local, path: {$dirName}/")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput("$dir Does not have any file or folder.")
@@ -234,19 +234,19 @@ it('it will upload everything successfully on specified folder', function () {
     expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
 });
 
-test("test when not passing disk token", function () {
+test('test when not passing disk token', function () {
     $dir = base_path();
 
     $this->artisan("put --disk dropbox --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput("Uploading to disk: dropbox, path: git-backup/")
+        ->expectsOutput('Uploading to disk: dropbox, path: git-backup/')
         ->expectsOutput(PHP_EOL)
         ->expectsOutput("Counldn't create directory in disk path git-backup/.editorconfig. Check your connection, or set disk authorization tokens.")
         ->assertExitCode(Command::FAILURE);
 });
 
-test("test when disk tokens are not valid", function () {
+test('test when disk tokens are not valid', function () {
     $dir = base_path();
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOL'
@@ -259,7 +259,7 @@ test("test when disk tokens are not valid", function () {
     $this->artisan("put --disk dropbox --disk-tokens {$diskTokensPath} --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput("Uploading to disk: dropbox, path: git-backup/")
+        ->expectsOutput('Uploading to disk: dropbox, path: git-backup/')
         ->expectsOutput(PHP_EOL)
         ->expectsOutput("Counldn't create directory in disk path git-backup/.editorconfig. Check your connection, or set disk authorization tokens.")
         ->assertExitCode(Command::FAILURE);

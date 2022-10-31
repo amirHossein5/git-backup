@@ -5,7 +5,9 @@ namespace App\Traits;
 trait RepositoryManagerStats
 {
     private static array $fetchedRepos = [];
+
     private static array $clonedReposTo = [];
+
     private static array $fetchedAllBranchesOfRepos = [];
 
     public static function clearStats(): void

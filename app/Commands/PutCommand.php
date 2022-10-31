@@ -106,6 +106,7 @@ class PutCommand extends Command
             $exists = Storage::disk($disk)->exists($dirPathWillBe);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+
             return Output::FAILURE;
         }
 
@@ -143,6 +144,7 @@ class PutCommand extends Command
             $this->uploadFolder($dirPath, $dirPath);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+
             return Output::FAILURE;
         }
 
