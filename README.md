@@ -2,6 +2,10 @@ This package clones(mirrored) repos from specified server(s), then repos can be 
 
 Currently available disk: dropbox.
 
+## Requirements
+
+- PHP `^8.0`
+
 ## Installation
 
 Clone the repo:
