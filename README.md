@@ -24,7 +24,7 @@ Then you can see available commands via:
 
 ## Getting all repositories from server(s)
 
-For cloning/fetching repositories from server(s), you need a [config file which you specified servers](#configuring-servers),
+For cloning/fetching repositories from server(s), you need a [config file that you specify servers](#configuring-servers),
 then pass the config file path to command:
 
 ```sh
