@@ -18,6 +18,8 @@ class JsonDecoder
 
     public static function decodePath(string $path): array
     {
+        $path = pathable($path);
+
         if (is_dir($path)) {
             throw new \Exception("{$path} Is directory not json file.");
         }

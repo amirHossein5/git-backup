@@ -98,14 +98,13 @@ class GetCommand extends Command
 
             $this->info("<comment>{$reposCount}</comment> repository found. Cloning/Fetching...");
 
+            $cloneTo = pathable($data['clone']['to']);
             $summaryMessages[] = '';
             $summaryMessages[] = "name: <comment>{$data['name']}</comment>";
             $summaryMessages[] = "found repos count: <comment>{$reposCount}</comment>";
-            $summaryMessages[] = "path to repos: {$data['clone']['to']}";
+            $summaryMessages[] = "path to repos: {$cloneTo}";
 
             $this->newLine();
-
-            $cloneTo = pathable($data['clone']['to']);
 
             if (! is_dir($cloneTo)) {
                 $this->error('Directory not found: '.$cloneTo);

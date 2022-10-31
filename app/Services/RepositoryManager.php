@@ -12,6 +12,8 @@ class RepositoryManager
 
     public static function hasAnyBranches(string $repoPath): bool
     {
+        $repoPath = pathable($repoPath);
+
         $command = self::getCommandToSeeAllBranches();
 
         exec("cd {$repoPath} && {$command} 2>&1", $output);
@@ -27,6 +29,8 @@ class RepositoryManager
 
     public static function fetchAllBranches(string $repoPath): void
     {
+        $repoPath = pathable($repoPath);
+
         self::addFetchedAllBranchesOfRepos($repoPath);
 
         system("cd {$repoPath} && git fetch --all; git pull --all;".self::getCommandToFetchAllBranches());
@@ -34,6 +38,8 @@ class RepositoryManager
 
     public static function isGitRepo(string $dir): bool
     {
+        $dir = pathable($dir);
+
         exec("cd {$dir} && git status 2>&1", $output);
 
         return str($output[0])->contains('On branch');
@@ -41,6 +47,8 @@ class RepositoryManager
 
     public static function cloneOrFetch(string $cloneTo, string $repoName, string $gitCloneCommand): Collection
     {
+        $cloneTo = pathable($cloneTo);
+
         if (is_dir($dir = $cloneTo.DIRECTORY_SEPARATOR.$repoName)) {
             return self::fetch($dir);
         }
@@ -73,6 +81,7 @@ class RepositoryManager
 
     public static function clone(string $cloneTo, string $gitCloneCommand, bool $afterNewLine = true): void
     {
+        $cloneTo = pathable($cloneTo);
         $command = "cd {$cloneTo} && ";
 
         if ($afterNewLine) {
@@ -86,6 +95,8 @@ class RepositoryManager
 
     public static function fetch(string $dir): Collection
     {
+        $dir = pathable($dir);
+
         exec("cd {$dir} && git fetch 2>&1", $output);
 
         self::addFetchedRepos($dir);

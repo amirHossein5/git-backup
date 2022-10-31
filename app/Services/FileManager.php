@@ -12,7 +12,7 @@ class FileManager
      */
     public static function allFiles(string $dir): array
     {
-        $dir .= DIRECTORY_SEPARATOR;
+        $dir = pathable("$dir/");
         $dir = str($dir)->rtrim(DIRECTORY_SEPARATOR);
         $ffs = scandir($dir);
 
@@ -45,7 +45,7 @@ class FileManager
      */
     public static function allDir(string $dir): array
     {
-        $dir .= DIRECTORY_SEPARATOR;
+        $dir = pathable("$dir/");
         $dir = str($dir)->rtrim(DIRECTORY_SEPARATOR);
         $ffs = scandir($dir);
 
@@ -72,6 +72,7 @@ class FileManager
 
     public static function countAllNestedFiles(string $dirPath): int
     {
+        $dirPath = pathable($dirPath);
         $count = 0;
 
         $count += count(FileManager::allFiles($dirPath));
@@ -85,6 +86,7 @@ class FileManager
 
     public static function countNestedEmptyFolders(string $dirPath): int
     {
+        $dirPath = pathable($dirPath);
         $count = 0;
 
         foreach (FileManager::allDir($dirPath) as $dir) {

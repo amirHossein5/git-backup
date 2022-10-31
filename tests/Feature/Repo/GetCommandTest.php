@@ -10,13 +10,13 @@ it('has required options', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: some/not/found")
+        ->expectsOutput("Counld'nt find config file in path: ".pathable("some/not/found"))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error if config file not found', function () {
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: some/not/found")
+        ->expectsOutput("Counld'nt find config file in path: ".pathable("some/not/found"))
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -178,12 +178,12 @@ it('shows error if require config key missing', function () {
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('1 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: /some/path')
+        ->expectsOutput('Directory not found: '.pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 1')
-        ->expectsOutput('path to repos: /some/path')
+        ->expectsOutput('path to repos: '.pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -210,12 +210,12 @@ it('shows error if require config key missing', function () {
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('2 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: /some/path')
+        ->expectsOutput('Directory not found: '.pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 2')
-        ->expectsOutput('path to repos: /some/path')
+        ->expectsOutput('path to repos: '.pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 });
 
@@ -244,12 +244,12 @@ it('skips server when clone.to directory not found', function () {
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('1 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: /some/path')
+        ->expectsOutput('Directory not found: '.pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 1')
-        ->expectsOutput('path to repos: /some/path')
+        ->expectsOutput('path to repos: '.pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 });
 
@@ -309,7 +309,7 @@ it('fails on wrong server token', function () {
 
 it('filters repos', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
-    $to = base_path('tests/temp');
+    $to = base_path(pathable('tests/temp'));
 
     Storage::disk('local')->put('tests/temp/config.json', <<<EOL
     {
@@ -334,13 +334,13 @@ it('filters repos', function () {
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 0')
-        ->expectsOutput("path to repos: {$to}")
+        ->expectsOutput("path to repos: ".pathable($to))
         ->assertExitCode(Command::SUCCESS);
 });
 
 it('gets filtered repo', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp1/config.json');
-    $to = base_path('tests/temp');
+    $to = base_path(pathable('tests/temp'));
 
     Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
     {
@@ -372,7 +372,7 @@ it('gets filtered repo', function () {
 
 it('skips server when no repo found', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
-    $to = base_path('tests/temp');
+    $to = base_path(pathable('tests/temp'));
 
     Storage::disk('local')->put('tests/temp/config.json', <<<EOL
     {
@@ -418,7 +418,7 @@ it('skips server when no repo found', function () {
 
 it('clones repos', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp1/config.json');
-    $to = base_path('tests/temp');
+    $to = base_path(pathable('tests/temp'));
 
     Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
     {
@@ -455,7 +455,7 @@ it('clones repos', function () {
     Storage::disk('local')
         ->deleteDirectory('tests/temp');
     Storage::disk('local')
-            ->makeDirectory('tests/temp');
+        ->makeDirectory('tests/temp');
 
     Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
     {
@@ -503,7 +503,7 @@ it('clones repos', function () {
 
 it('fetches repos', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp1/config.json');
-    $to = base_path('tests/temp');
+    $to = base_path(pathable('tests/temp'));
 
     Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
     {
@@ -540,7 +540,7 @@ it('fetches repos', function () {
     Storage::disk('local')
         ->deleteDirectory('tests/temp');
     Storage::disk('local')
-            ->makeDirectory('tests/temp');
+        ->makeDirectory('tests/temp');
 
     RepositoryManager::clearStats();
 
