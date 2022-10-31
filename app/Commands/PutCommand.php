@@ -53,11 +53,12 @@ class PutCommand extends Command
         }
 
         $disk = $this->option('disk');
-        $dirPath = $this->option('dir');
+        $dirPath = pathable($this->option('dir'));
         $toDir = $this->option('to-dir');
         $dirPathWillBe = $toDir ? pathable($toDir) : basename($dirPath);
         $dirPathWillBe = str($dirPathWillBe)->rtrim(DIRECTORY_SEPARATOR);
         $showDiskCommand = getArtisanCommand('show:disk');
+        $tokensPath = pathable($this->option('disk-tokens'));
 
         $this->disk = $disk;
         $this->dirPathWillBe = $dirPathWillBe;
@@ -75,7 +76,7 @@ class PutCommand extends Command
             return Output::FAILURE;
         }
 
-        if ($tokensPath = $this->option('disk-tokens')) {
+        if ($tokensPath) {
             if (! file_exists($tokensPath)) {
                 $this->error('File not found at: '.$tokensPath);
 

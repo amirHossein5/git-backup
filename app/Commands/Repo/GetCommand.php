@@ -45,7 +45,7 @@ class GetCommand extends Command
             return Output::FAILURE;
         }
 
-        $configPath = $this->option('config');
+        $configPath = pathable($this->option('config'));
 
         if (! file_exists($configPath)) {
             $this->error("Counld'nt find config file in path: ".$configPath);
@@ -105,19 +105,21 @@ class GetCommand extends Command
 
             $this->newLine();
 
-            if (! is_dir($data['clone']['to'])) {
-                $this->error('Directory not found: '.$data['clone']['to']);
+            $cloneTo = pathable($data['clone']['to']);
+
+            if (! is_dir($cloneTo)) {
+                $this->error('Directory not found: '.$cloneTo);
 
                 continue;
             }
 
-            $this->withProgressBar($repoNames, function ($repoName) use ($data) {
+            $this->withProgressBar($repoNames, function ($repoName) use ($data, $cloneTo) {
                 $repoName = str($repoName)->endsWith('.git')
                     ? $repoName
                     : $repoName.'.git';
 
                 $output = RepositoryManager::cloneOrFetch(
-                    $data['clone']['to'],
+                    $cloneTo,
                     $repoName,
                     str("git clone --mirror {$data['clone']['using']}")->replace('<repo>', $repoName)
                 );

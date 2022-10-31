@@ -1,8 +1,10 @@
 <?php
 
-function pathable(string $path): string
+function pathable(?string $path): ?string
 {
-    return str($path)->replace('/', DIRECTORY_SEPARATOR);
+    return $path === null
+        ? null
+        : str($path)->replace('/', DIRECTORY_SEPARATOR);
 }
 
 function getArtisanCommand(string $command): string
