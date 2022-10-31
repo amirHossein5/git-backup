@@ -350,7 +350,7 @@ it('gets filtered repo', function () {
                 "name": "some name",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "from-api": "https://api.github.com/search/repositories?q=user:amirhossein5",
@@ -428,7 +428,7 @@ it('clones repos', function () {
                 "name": "some name",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": [
@@ -465,7 +465,7 @@ it('clones repos', function () {
                 "name": "some name",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com:/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": "full-screen-js-codes.git"
@@ -475,7 +475,7 @@ it('clones repos', function () {
                 "name": "another server",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": "laravel-livewire.git"
@@ -513,7 +513,7 @@ it('fetches repos', function () {
                 "name": "some name",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": [
@@ -552,7 +552,7 @@ it('fetches repos', function () {
                 "name": "some name",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": "full-screen-js-codes.git"
@@ -562,7 +562,7 @@ it('fetches repos', function () {
                 "name": "another server",
                 "clone": {
                     "to": "{$to}",
-                    "using": "git@github.com:/amirhossein5/<repo>"
+                    "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
                     "names": "laravel-livewire.git"
