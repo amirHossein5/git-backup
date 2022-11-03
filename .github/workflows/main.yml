@@ -64,30 +64,30 @@ jobs:
       - name: Execute tests (Unit and Feature tests) via Pest
         run: php backup test
         
-  windows-tests:
+  # windows-tests:
     
-    strategy:
-      fail-fast: true
-      matrix:
-        php: ['8.1']
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       php: ['8.1']
 
-    runs-on: windows-2019
+  #   runs-on: windows-2019
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
       
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, memcached
-          tools: composer:v2
-          coverage: none
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: ${{ matrix.php }}
+  #         extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, memcached
+  #         tools: composer:v2
+  #         coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer update --prefer-dist --no-progress --prefer-stable
+  #     - name: Install dependencies
+  #       run: |
+  #         composer update --prefer-dist --no-progress --prefer-stable
           
-      - name: Execute tests (Unit and Feature tests) via Pest
-        run: php backup test
+  #     - name: Execute tests (Unit and Feature tests) via Pest
+  #       run: php backup test
