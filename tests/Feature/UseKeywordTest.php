@@ -26,15 +26,15 @@ beforeEach(function () {
 test('adds keys to array', function () {
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "some path",
-                    "using": "git c"
+                name: some name
+                clone: {
+                    to: some path
+                    using: git c
                 },
-                "repo-names": {
-                    "names": "a repo name"
+                repo-names: {
+                    names: a repo name
                 }
             }
         ]
@@ -53,23 +53,23 @@ test('adds keys to array', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "name": "some name",
-        "clone": {
-            "to": "some path",
-            "using": "git c"
+        name: some name
+        clone: {
+            to: some path
+            using: git c
         },
-        "repo-names": {
-            "names": "a repo name"
+        repo-names: {
+            names: a repo name
         }
     }
     EOL);
 
     $config = ConfigReader::read(<<<EOL
     {
-        "servers": [
+        servers: [
             {
-                "use": {
-                    "from": "$usePath"
+                use: {
+                    from: $usePath
                 }
             }
         ]
@@ -84,25 +84,25 @@ test('adds keys to array, without rewriting previous ones', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "name": "new name",
-        "clone": {
-            "to": "new path",
-            "using": "git c"
+        name: new name
+        clone: {
+            to: new path
+            using: git c
         }
     }
     EOL);
 
     $config = ConfigReader::read(<<<EOL
     {
-        "servers": [
+        servers: [
             {
-                "use": "$usePath",
-                "name": "some name",
-                "clone": {
-                    "to": "some path"
+                use: $usePath
+                name: some name
+                clone: {
+                    to: some path
                 },
-                "repo-names": {
-                    "names": "a repo name"
+                repo-names: {
+                    names: a repo name
                 }
             }
         ]
@@ -117,28 +117,28 @@ test('adds keys to array, with vars', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "name": "-serverName-",
-        "clone": {
-            "to": "-clone.to-",
-            "using": "-clone.using-"
+        name: -serverName-
+        clone: {
+            to: -clone.to-
+            using: -clone.using-
         }
     }
     EOL);
 
     $config = ConfigReader::read(<<<EOL
     {
-        "servers": [
+        servers: [
             {
-                "use": {
-                    "from": "$usePath",
-                    "with": {
-                        "serverName": "some name",
-                        "clone.to": "some path",
-                        "clone.using": "git c"
+                use: {
+                    from: $usePath
+                    with: {
+                        serverName: some name
+                        clone.to: some path
+                        clone.using: git c
                     }
                 },
-                "repo-names": {
-                    "names": "a repo name"
+                repo-names: {
+                    names: a repo name
                 }
             }
         ]

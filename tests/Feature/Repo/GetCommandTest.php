@@ -23,22 +23,7 @@ it('shows error if config file not found', function () {
 it('shows error if cannot decode config', function () {
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        // some invalid config
-    }
-    EOL);
-
-    $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
-
-    $this->artisan('repo:get --config '.$pathToConfig)
-        ->expectsOutput('Error when decoding json: ')
-        ->expectsOutput('Syntax error')
-        ->assertExitCode(Command::FAILURE);
-});
-
-it('shows error if require config key missing', function () {
-    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
-    {
-        "sss": "sss"
+        // some valid hjson config
     }
     EOL);
 
@@ -50,7 +35,32 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        somekey
+    }
+    EOL);
+
+    $this->artisan('repo:get --config '.$pathToConfig)
+        ->expectsOutput('Error when decoding json: ')
+        ->expectsOutputToContain("Found '}' where a key name was expected")
+        ->assertExitCode(Command::FAILURE);
+});
+
+it('shows error if require config key missing', function () {
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        sss: sss
+    }
+    EOL);
+
+    $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
+
+    $this->artisan('repo:get --config '.$pathToConfig)
+        ->expectsOutput('Undefined array key "servers"')
+        ->assertExitCode(Command::FAILURE);
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        servers: [
             {
 
             }
@@ -64,9 +74,9 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name"
+                name: some name
             }
         ]
     }
@@ -78,11 +88,11 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path"
+                name: some name
+                clone: {
+                    to: /some/path
                 }
             }
         ]
@@ -95,12 +105,12 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 }
             }
         ]
@@ -113,15 +123,15 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 },
-                "repo-names": {
-                    "from-api": "someserver.com"
+                repo-names: {
+                    from-api: someserver.com
                 }
             }
         ]
@@ -134,16 +144,16 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 },
-                "repo-names": {
-                    "from-api": "smoenotfoundserver.notfound",
-                    "pattern": "*.name"
+                repo-names: {
+                    from-api: smoenotfoundserver.notfound
+                    pattern: *.name
                 }
             }
         ]
@@ -158,15 +168,15 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 },
-                "repo-names": {
-                    "names": "repo-name"
+                repo-names: {
+                    names: repo-name
                 }
             }
         ]
@@ -188,16 +198,16 @@ it('shows error if require config key missing', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 },
-                "repo-names": {
-                    "names": [
-                        "first", "second"
+                repo-names: {
+                    names: [
+                        first, second
                     ]
                 }
             }
@@ -224,15 +234,15 @@ it('skips server when clone.to directory not found', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        "servers": [
+        servers: [
             {
-                "name": "some name",
-                "clone": {
-                    "to": "/some/path",
-                    "using": "git@github.com..."
+                name: some name
+                clone: {
+                    to: /some/path
+                    using: git@github.com...
                 },
-                "repo-names": {
-                    "names": "repo-name"
+                repo-names: {
+                    names: repo-name
                 }
             }
         ]

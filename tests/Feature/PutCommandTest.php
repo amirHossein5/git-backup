@@ -50,13 +50,13 @@ it('shows error when could not decode disk tokens json', function () {
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', '
     {
-        // invalid json
+        somekey
     }
     ');
 
     $this->artisan("put --disk local --disk-tokens {$diskTokensPath} --dir={$dir}")
         ->expectsOutput('Error when decoding json:')
-        ->expectsOutput('Syntax error')
+        ->expectsOutputToContain("Found '}' where a key name was expected")
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -65,9 +65,9 @@ it('sets disk tokens correctly', function () {
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOT'
     {
-        "notexists": "sometoken",
-        "key": "somekey",
-        "secret": "somesecret"
+        notexists: sometoken
+        key: somekey
+        secret: somesecret
     }
     EOT);
 
@@ -251,8 +251,8 @@ test('test when disk tokens are not valid', function () {
     $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOL'
     {
-        "key": "some key",
-        "token": "sometoken"
+        key: some key
+        token: sometoken
     }
     EOL);
 
