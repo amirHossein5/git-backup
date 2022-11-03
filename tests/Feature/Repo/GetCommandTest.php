@@ -45,7 +45,7 @@ it('shows error if cannot decode config', function () {
         ->assertExitCode(Command::FAILURE);
 });
 
-it('shows error if require config key missing', function () {
+it('shows error if required config key missing', function () {
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
         sss: sss
@@ -207,7 +207,7 @@ it('shows error if require config key missing', function () {
                 },
                 repo-names: {
                     names: [
-                        first, second
+                        "first", 'second'
                     ]
                 }
             }
