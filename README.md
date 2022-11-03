@@ -80,7 +80,7 @@ then pass path of json file via `--disk-tokens`.
 
 e.g, json file for dropbox:
 
-```json
+```hjson
 {
     "key": "app key",
     "secret": "app secret",
@@ -102,13 +102,13 @@ For seeing available disks run:
 
 ## Configuration
 
-Config files are in json format.
+Config files are in json format. (also [hjson](https://github.com/hjson/hjson-php) is supported)
 
 ## Configuring Servers
 
 The base of servers configuration json file:
 
-```json
+```hjson
 {
     "servers": [
         ...
@@ -118,7 +118,7 @@ The base of servers configuration json file:
 
 Each server needs a name, a path that repos be clone there, git clone command, repo names. So:
 
-```json
+```hjson
 {
     "servers": [
         {
@@ -188,21 +188,21 @@ For getting repository names from api, you can define a api url, with a pattern 
 
 The `use` keyword is for including json keys inside current json file(keys won't be override).
 
-for example if you `use` in `config.json` file:
+for example if you `use` in config file:
 
-```json
+```hjson
 {
     // ...
     {
         "name": "some name",
-        "use": "path/to/file.json"
+        "use": "path/to/file.hjson"
     }
 }
 ```
 
-e.g, file `path/to/file.json`:
+e.g, file `path/to/file.hjson`:
 
-```json
+```hjson
 {
     "name": "new",
     "example": "new example",
@@ -213,9 +213,9 @@ e.g, file `path/to/file.json`:
 }
 ```
 
-`config.json` file will be render to:
+config file will be render to:
 
-```json
+```hjson
 {
     // ...
     {
@@ -233,9 +233,9 @@ e.g, file `path/to/file.json`:
 
 Define variables value in `use.with`, and write variabe name `-`inside`-`. For example:
 
-file `path/to/file.json`:
+file `path/to/file.hjson`:
 
-```json
+```hjson
 {
     "clone": {
         "to": "-clone.to-",
@@ -244,14 +244,14 @@ file `path/to/file.json`:
 }
 ```
 
-`config.json` file:
+config file:
 
-```json
+```hjson
 {
     // ...
     {
         "use": {
-            "from": "path/to/file.json",
+            "from": "path/to/file.hjson",
             "with": {
                 "clone.to": "clone/here",
                 "cloneUsing": "git@github.com:/amirhossein5/<repo>"
@@ -261,9 +261,9 @@ file `path/to/file.json`:
 }
 ```
 
-`config.json` file will be render to:
+config file will be render to:
 
-```json
+```hjson
 {
     // ...
     {

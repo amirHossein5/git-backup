@@ -4,13 +4,18 @@ namespace App\Services;
 
 use App\Exceptions\FileNotFoundException;
 use App\Exceptions\JsonDecodeException;
+use HJSON\HJSONParser;
 
 class JsonDecoder
 {
     public static function decode(string $jsonContent): array
     {
-        if (! $decodedJson = json_decode($jsonContent, true)) {
-            throw new JsonDecodeException(json_last_error_msg());
+        $parser = new HJSONParser();
+
+        try {
+            $decodedJson = $parser->parse($jsonContent, ['assoc' => true]);
+        } catch (\Exception $e) {
+            throw new JsonDecodeException($e->getMessage());
         }
 
         return $decodedJson;

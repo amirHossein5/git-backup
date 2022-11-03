@@ -85,7 +85,7 @@ class RepositoryManager
         $command = "cd {$cloneTo} && ";
 
         if ($afterNewLine) {
-            $command .= 'echo; ';
+            $command .= 'echo && ';
         }
 
         system($command.$gitCloneCommand);
@@ -104,13 +104,13 @@ class RepositoryManager
         return collect($output);
     }
 
-    private static function getCommandToFetchAllBranches(): string
-    {
-        return 'git branch -r | grep -v \'\->\' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done';
-    }
+    // private static function getCommandToFetchAllBranches(): string
+    // {
+    //     return 'git branch -r | grep -v \'\->\' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done';
+    // }
 
-    private static function getCommandToSeeAllBranches(): string
-    {
-        return 'git branch -r';
-    }
+    // private static function getCommandToSeeAllBranches(): string
+    // {
+    //     return 'git branch -r';
+    // }
 }

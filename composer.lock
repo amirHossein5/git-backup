@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "35b06ee42f561771e5443a3c5a4f2e3b",
+    "content-hash": "c4b04206d3712af438308dc5c20793ed",
     "packages": [
         {
             "name": "brick/math",
@@ -1806,6 +1806,61 @@
                 }
             ],
             "time": "2021-12-01T16:20:42+00:00"
+        },
+        {
+            "name": "laktak/hjson",
+            "version": "v2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hjson/hjson-php.git",
+                "reference": "f2c9eb194c5d294ed5e6a2dbcf79e5d7f4c3fb83"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hjson/hjson-php/zipball/f2c9eb194c5d294ed5e6a2dbcf79e5d7f4c3fb83",
+                "reference": "f2c9eb194c5d294ed5e6a2dbcf79e5d7f4c3fb83",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "HJSON\\": "src/HJSON"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Issam Zoli",
+                    "email": "jawbfl@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "JSON for Humans. A configuration file format with relaxed syntax, fewer mistakes and more comments.",
+            "homepage": "https://github.com/hjson/hjson-php",
+            "keywords": [
+                "comments",
+                "config",
+                "hjson",
+                "human",
+                "json",
+                "parser",
+                "serializer"
+            ],
+            "support": {
+                "issues": "https://github.com/hjson/hjson-php/issues",
+                "source": "https://github.com/hjson/hjson-php/tree/v2.2.0"
+            },
+            "time": "2021-12-27T17:39:24+00:00"
         },
         {
             "name": "laravel-zero/foundation",
@@ -7571,7 +7626,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0"
+        "php": "^8.1"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
