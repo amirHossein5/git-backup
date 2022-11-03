@@ -163,7 +163,7 @@ it('shows error if required config key missing', function () {
     $this->artisan('repo:get --config '.$pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
-        ->expectsOutput('cURL error 6: Could not resolve host: smoenotfoundserver.notfound (see https://curl.haxx.se/libcurl/c/libcurl-errors.html)')
+        ->expectsOutputToContain('cURL error 6: Could not resolve host: smoenotfoundserver.notfound')
         ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
