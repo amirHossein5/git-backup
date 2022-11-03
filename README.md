@@ -4,7 +4,7 @@ Currently available disk: dropbox.
 
 ## Requirements
 
-- PHP `^8.1`
+-   PHP `^8.1`
 
 ## Installation
 
