@@ -102,7 +102,7 @@ For seeing available disks run:
 
 ## Configuration
 
-Config files are in json format. (also [hjson](https://github.com/hjson/hjson-php) is supported)
+Config files are in json or also, [hjson](https://github.com/hjson/hjson-php) is supported.
 
 ## Configuring Servers
 
