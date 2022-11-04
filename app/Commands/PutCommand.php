@@ -153,9 +153,9 @@ class PutCommand extends Command
         $this->progressBar->finish();
 
         $this->newLine();
-        $dirsize = readable_size(dirsize($dirPath));
+        $totalSize = readable_size(dirsize($dirPath));
 
-        $this->info("Uploaded {$dirPath}($dirsize) to {$dirPathWillBe} successfully.");
+        $this->info("Uploaded {$dirPath}($totalSize) to {$dirPathWillBe} successfully.");
 
         return Output::SUCCESS;
     }
@@ -203,7 +203,9 @@ class PutCommand extends Command
 
         foreach ($allFiles as $file) {
             $readableFile = (string) str($file)->replace($baseDirPath, basename($baseDirPath));
-            $this->progressBar->setMessage("Uploading <comment>$readableFile</comment>");
+            $fileSize = readable_size(filesize($file));
+
+            $this->progressBar->setMessage("Uploading <comment>{$readableFile}({$fileSize})</comment>");
 
             $filePath = str($file)->replace(
                 str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
