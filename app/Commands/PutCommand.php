@@ -153,7 +153,9 @@ class PutCommand extends Command
         $this->progressBar->finish();
 
         $this->newLine();
-        $this->info("Uploaded $dirPath to {$dirPathWillBe} successfully.");
+        $dirsize = readable_size(dirsize($dirPath));
+
+        $this->info("Uploaded {$dirPath}($dirsize) to {$dirPathWillBe} successfully.");
 
         return Output::SUCCESS;
     }
