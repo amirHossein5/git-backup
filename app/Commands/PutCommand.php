@@ -208,9 +208,15 @@ class PutCommand extends Command
                 $this->dirPathWillBe
             );
 
+            $fileContent = file_get_contents($file);
+
+            if ($fileContent  === '') {
+                $fileContent = ' ';
+            }
+
             $this->failWhen(
-                ! Storage::disk($this->disk)->put($filePath, file_get_contents($file)),
-                "Counldn't create directory in disk path {$filePath}. Check your connection, or set disk authorization tokens."
+                ! Storage::disk($this->disk)->put($filePath, $fileContent),
+                "Counldn't create file in disk path {$filePath}. Check your connection, or set disk authorization tokens."
             );
 
             $this->progressBar->advance();
