@@ -176,7 +176,10 @@ class PutCommand extends Command
 
     private function uploadFolder(string $dir, string $baseDirPath): void
     {
-        $readableDir = (string) str($dir)->replace($baseDirPath, basename($baseDirPath));
+        $readableDir = (string) str($dir)->replace(
+            str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR), basename($baseDirPath)
+        );
+
         $allFiles = FileManager::allFiles($dir);
         $allDirs = FileManager::allDir($dir);
 
