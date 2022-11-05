@@ -41,7 +41,7 @@ it('shows error when passed disk tokens not exists or is dir', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan("put --disk local --disk-tokens {$dir} --dir={$dir}")
-        ->expectsOutput("Disk tokens should be json file not directory: ".pathable($dir))
+        ->expectsOutput("expected json found directory: ".pathable($dir))
         ->assertExitCode(Command::FAILURE);
 });
 

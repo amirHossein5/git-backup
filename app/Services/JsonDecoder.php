@@ -26,10 +26,10 @@ class JsonDecoder
         $path = pathable($path);
 
         if (is_dir($path)) {
-            throw new \Exception("{$path} Is directory not json file.");
+            throw new \Exception("expected json found directory: {$path}");
         }
         if (! file_exists($path)) {
-            throw new FileNotFoundException("File not found: {$path}");
+            throw new FileNotFoundException("File not found at: {$path}");
         }
 
         $json = file_get_contents($path);
