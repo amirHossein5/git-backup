@@ -10,13 +10,16 @@ use App\Traits\HasForcedOptions;
 use Illuminate\Support\Facades\Storage;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class PutCommand extends Command
 {
     use HasForcedOptions;
 
     private ProgressBar $progressBar;
+    private Cursor $cursor;
 
     private string $dirPathWillBe;
     private int $totalUploadedBytes = 0;
@@ -48,6 +51,8 @@ class PutCommand extends Command
      */
     public function handle()
     {
+        $this->cursor = new Cursor($this->output);
+
         if (! $this->hasAllOptions('disk', 'dir')) {
             return Output::FAILURE;
         }
@@ -138,7 +143,6 @@ class PutCommand extends Command
         }
 
         $this->progressBar = $this->editProgressBar($countSteps);
-        $this->progressBar->setMessage('<info>Loading...</info>');
         $this->progressBar->start();
 
         try {
@@ -149,7 +153,6 @@ class PutCommand extends Command
             return Output::FAILURE;
         }
 
-        $this->progressBar->setMessage('');
         $this->progressBar->finish();
 
         $this->newLine();
@@ -188,7 +191,7 @@ class PutCommand extends Command
         $allDirs = FileManager::allDir($dir);
 
         if (count($allFiles) === 0 and count($allDirs) === 0) {
-            $this->progressBar->setMessage("mkdir <comment>$readableDir</comment>");
+            $this->writeMessageNL(" mkdir <comment>$readableDir</comment>");
 
             $path = str($dir)->replace(
                 str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
@@ -200,14 +203,18 @@ class PutCommand extends Command
                 "Counldn't create directory in disk path {$path}. Check your connection, or set disk authorization tokens."
             );
 
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
             $this->progressBar->advance();
         }
 
         foreach ($allFiles as $file) {
-            $readableFile = (string) str($file)->replace($baseDirPath, basename($baseDirPath));
+            $readableFile = (string) str($file)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                basename($baseDirPath)
+            );
             $fileSize = readable_size(filesize($file));
 
-            $this->progressBar->setMessage("Uploading <comment>{$readableFile}({$fileSize})</comment>");
+            $this->writeMessageNL(" Uploading <comment>{$readableFile}({$fileSize})</comment>");
 
             $filePath = str($file)->replace(
                 str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
@@ -225,7 +232,8 @@ class PutCommand extends Command
                 "Counldn't create file in disk path {$filePath}. Check your connection, or set disk authorization tokens."
             );
 
-            $this->totalUploadedBytes += filesize($filePath);
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+            $this->totalUploadedBytes += filesize($file);
             $this->progressBar->advance();
         }
 
@@ -237,9 +245,21 @@ class PutCommand extends Command
     private function editProgressBar(int $len): ProgressBar
     {
         $progressBar = new ProgressBar($this->output, $len);
-        $progressBar->setFormat(' %current%/%max%  %percent:3s%%    (%elapsed:6s%/%estimated:-6s%)'.PHP_EOL.' %message%');
+        $progressBar->setFormat(' %current%/%max%  %percent:3s%%    (%elapsed:6s%/%estimated:-6s%)');
 
         return $progressBar;
+    }
+
+    private function writeMessage(string $string): void
+    {
+        $this->cursor->clearLine()->moveUp();
+        $this->line($string);
+    }
+
+    private function writeMessageNL(string $string, int $newLines = 2): void
+    {
+        $this->newLine($newLines);
+        $this->writeMessage($string);
     }
 
     private function failWhen(bool $when, string $message): void
