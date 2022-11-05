@@ -19,7 +19,7 @@ class PutCommand extends Command
     private ProgressBar $progressBar;
 
     private string $dirPathWillBe;
-
+    private int $totalUploadedBytes = 0;
     private string $disk;
 
     /**
@@ -153,9 +153,11 @@ class PutCommand extends Command
         $this->progressBar->finish();
 
         $this->newLine();
-        $totalSize = readable_size(dirsize($dirPath));
+        $totalSize = readable_size($this->totalUploadedBytes);
 
-        $this->info("Uploaded {$dirPath}($totalSize) to {$dirPathWillBe} successfully.");
+        $this->info("Uploaded {$dirPath} to {$dirPathWillBe} successfully.");
+        $this->info("total uploaded file size: {$totalSize}");
+
 
         return Output::SUCCESS;
     }
@@ -186,7 +188,7 @@ class PutCommand extends Command
         $allDirs = FileManager::allDir($dir);
 
         if (count($allFiles) === 0 and count($allDirs) === 0) {
-            $this->progressBar->setMessage("Uploading <comment>$readableDir</comment>");
+            $this->progressBar->setMessage("mkdir <comment>$readableDir</comment>");
 
             $path = str($dir)->replace(
                 str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
@@ -223,6 +225,7 @@ class PutCommand extends Command
                 "Counldn't create file in disk path {$filePath}. Check your connection, or set disk authorization tokens."
             );
 
+            $this->totalUploadedBytes += filesize($filePath);
             $this->progressBar->advance();
         }
 
