@@ -65,11 +65,19 @@ For putting some **directory** to a [disk](#show-disk-command), run:
 
 ### Options when directory already exists in disk
 
-If directory that you're uploading already exists in the specfied disk, then some options will be show you,
-like deleting directory from disk(this just removes the uploaded directory from disk), select new name(equilvant of `--to-dir`, uploads directory with another dir name)
-, replacing directory(replaces directory with previously uploaded one, and files that are same with previously uploaded ones, won't be upload again, and uses uploaded one)
-, merge(uploads new files, or files that are different with previously uploaded ones, and creates empty directories that aren't exists in uploaded folder), that you can choose.
+If directory that you're uploading already exists in the specfied disk, then some options will be show you, like 
 
+- deleting directory from disk
+    - this just removes the uploaded directory from disk
+- selecting new name
+    - equilvant of `--to-dir`, uploads directory with another dir name
+- replacing directory
+    - replaces directory with previously uploaded one
+    - files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
+- merge directory
+    - uploads new files, or files that are different with previously uploaded ones
+    - creates empty directories that aren't exists in uploaded folder
+    
 ### Specifying destination path
 
 By default your directory will be upload to path `passed-directory-name/`. If you want to specfiy custom path that your folder will be upload there, use `--to-dir`
