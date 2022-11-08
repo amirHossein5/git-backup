@@ -1,5 +1,6 @@
 <?php
 
+use App\Commands\PutCommand;
 use App\Services\FileManager;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Command\Command;
@@ -89,34 +90,6 @@ it('sets disk tokens correctly', function () {
     expect(isset($configArray['secret']))->toBeTrue();
 });
 
-it('shows confirmation to delete dir if already exists', function () {
-    $dir = base_path('stubs');
-
-    $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
-        ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Checking disk...')
-        ->expectsOutput('Directory tests/temp exists in disk: local')
-        ->expectsConfirmation('Do you want to delete '.pathable('tests/temp').' ?', 'no')
-        ->assertExitCode(Command::FAILURE);
-
-    expect(Storage::disk('local')->directoryExists('tests/temp'))->toBeTrue();
-});
-
-it('deletes dir if confirmation for file already exists passed', function () {
-    $dir = base_path('stubs');
-
-    $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
-        ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Checking disk...')
-        ->expectsOutput('Directory tests/temp exists in disk: local')
-        ->expectsConfirmation('Do you want to delete '.pathable('tests/temp').' ?', 'yes')
-        ->expectsOutput('Deleted '.pathable('tests/temp').': ✔')
-        ->expectsOutput('run command again.')
-        ->assertExitCode(Command::SUCCESS);
-
-    expect(Storage::disk('local')->directoryExists('tests/temp'))->not->toBeTrue();
-});
-
 it('shows error when dir does not have any file or folder', function () {
     $dirName = uniqid();
     Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
@@ -126,7 +99,6 @@ it('shows error when dir does not have any file or folder', function () {
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
         ->expectsOutput("Uploading to disk: local, path: ".pathable($dirName).'/')
-        ->expectsOutput(PHP_EOL)
         ->expectsOutput(pathable($dir)." Does not have any file or folder.")
         ->assertExitCode(Command::FAILURE);
 });
@@ -279,4 +251,124 @@ test('test when disk tokens are not valid', function () {
         ->expectsOutput(PHP_EOL)
         ->expectsOutput("Counldn't create file in disk path ".pathable("git-backup/.editorconfig").". Check your connection, or set disk authorization tokens.")
         ->assertExitCode(Command::FAILURE);
+});
+
+it('when dir already exists, deletes dir', function () {
+    $dir = base_path('stubs');
+
+    $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsQuestion('Directory <comment>tests/temp</comment> exists in disk <comment>local</comment>', PutCommand::DELETE_FROM_DISK)
+        ->expectsOutput('Deleted tests/temp: ✔')
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(Storage::disk('local')->directoryExists('tests/temp'))->not->toBeTrue();
+});
+
+it('when dir already exists, uses new dir name', function () {
+    $dir = base_path('stubs');
+
+    $this->artisan("put --disk local --dir={$dir} --to-dir tests/temp")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsQuestion('Directory <comment>tests/temp</comment> exists in disk <comment>local</comment>', PutCommand::SELECT_NEW_NAME)
+        ->expectsQuestion('Write path(equilvant of --to-dir option)', 'tests/temp1')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsQuestion('Directory <comment>tests/temp1</comment> exists in disk <comment>local</comment>', PutCommand::DELETE_FROM_DISK)
+        ->expectsOutput('Deleted tests/temp1: ✔')
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(Storage::disk('local')->directoryExists('tests/temp'))->toBeTrue();
+    expect(Storage::disk('local')->directoryExists('tests/temp1'))->not->toBeTrue();
+});
+
+it('when dir already exists, replaces dir', function () {
+    $dir = base_path('will-be-replace');
+    Storage::disk('local')->deleteDirectory('tests/temp');
+    expect(glob('*.tmp'))->toHaveLength(0);
+
+    Storage::disk('local')->makeDirectory('will-be-replace/some/empty');
+    Storage::disk('local')->put('will-be-replace/text.txt', '/');
+    Storage::disk('local')->put('will-be-replace/another/text.txt', 'another/');
+    Storage::disk('local')->put('will-be-replace/some/text.txt', 'some/');
+    Storage::disk('local')->put('will-be-replace/some/dir/text.txt', 'some/dir/text.txt');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp"))
+        ->toBe(Command::SUCCESS);
+
+    Storage::disk('local')->deleteDirectory('will-be-replace');
+
+    Storage::disk('local')->makeDirectory('will-be-replace/another');
+    Storage::disk('local')->put('will-be-replace/some/new.txt', 'new file');
+    Storage::disk('local')->put('will-be-replace/some/dir/text.txt', 'new content');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp --replace"))
+        ->toBe(Command::SUCCESS);
+
+    expect(FileManager::allDir('tests/temp'))->toHaveLength(2);
+    expect(FileManager::allFiles('tests/temp'))->toHaveLength(0);
+
+    expect(FileManager::allDir('tests/temp/another'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/another'))->toHaveLength(0);
+
+    expect(FileManager::allDir('tests/temp/some'))->toHaveLength(1);
+    expect(FileManager::allFiles('tests/temp/some'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/some/dir'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/some/dir'))->toHaveLength(1);
+
+    expect(Storage::disk('local')->get('tests/temp/some/dir/text.txt'))
+        ->toBe('new content');
+    expect(Storage::disk('local')->get('tests/temp/some/new.txt'))
+        ->toBe('new file');
+
+    expect(Storage::disk('local')->deleteDirectory('will-be-replace'))->toBeTrue();
+    expect(glob('*.tmp'))->toHaveLength(0);
+});
+
+it('when dir already exists, merges dir', function () {
+    $dir = base_path('will-be-merge');
+    Storage::disk('local')->deleteDirectory('tests/temp');
+    expect(glob('*.tmp'))->toHaveLength(0);
+
+    Storage::disk('local')->makeDirectory('will-be-merge/some/empty');
+    Storage::disk('local')->put('will-be-merge/text.txt', '/');
+    Storage::disk('local')->put('will-be-merge/some/dir/text.txt', 'some/dir/text.txt');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp"))
+        ->toBe(Command::SUCCESS);
+
+    Storage::disk('local')->makeDirectory('will-be-merge/another');
+    Storage::disk('local')->put('will-be-merge/some/new.txt', 'new file');
+    Storage::disk('local')->put('will-be-merge/some/dir/text.txt', 'new content');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp --merge"))
+        ->toBe(Command::SUCCESS);
+
+    expect(FileManager::allDir('tests/temp'))->toHaveLength(2);
+    expect(FileManager::allFiles('tests/temp'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/another'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/another'))->toHaveLength(0);
+
+    expect(FileManager::allDir('tests/temp/some'))->toHaveLength(2);
+    expect(FileManager::allFiles('tests/temp/some'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/some/dir'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/some/dir'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/some/empty'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/some/empty'))->toHaveLength(0);
+
+    expect(Storage::disk('local')->get('tests/temp/text.txt'))
+        ->toBe('/');
+    expect(Storage::disk('local')->get('tests/temp/some/dir/text.txt'))
+        ->toBe('new content');
+    expect(Storage::disk('local')->get('tests/temp/some/new.txt'))
+        ->toBe('new file');
+
+    expect(Storage::disk('local')->deleteDirectory('will-be-merge'))->toBeTrue();
+    expect(glob('*.tmp'))->toHaveLength(0);
 });

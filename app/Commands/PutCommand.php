@@ -24,6 +24,14 @@ class PutCommand extends Command
     private string $dirPathWillBe;
     private int $totalUploadedBytes = 0;
     private string $disk;
+    private string $tempUploadedDirName;
+
+    // upload mods
+    public const DELETE_FROM_DISK = 'delete dir from disk';
+    public const SELECT_NEW_NAME = 'select new name for distination';
+    public const REPLACE_IT = 'replace it';
+    public const MERGE_IT = 'merge it with uploaded one';
+    public const UPLOAD_DIRECTLY = 'uploads to disk';
 
     /**
      * The signature of the command.
@@ -35,6 +43,8 @@ class PutCommand extends Command
         {--disk= : See disks via, show:disk }
         {--to-dir= : Put in disk path.}
         {--disk-tokens= : Path to json file that contains disk authorization items.}
+        {--merge : When already exists, merge it.}
+        {--replace : When already exists, replace it.}
     ';
 
     /**
@@ -93,33 +103,57 @@ class PutCommand extends Command
             return Output::FAILURE;
         }
 
-        if ($exists) {
-            $this->error('Directory '.$dirPathWillBe.' exists in disk: '.$disk);
+        $mod = self::UPLOAD_DIRECTLY;
 
-            if ($this->confirm('Do you want to delete '.$dirPathWillBe.' ?')) {
+        if ($exists) {
+            $mod = $this->getMod();
+
+            if ($mod === self::DELETE_FROM_DISK) {
                 $this->task("Deleted {$dirPathWillBe}", fn () => Storage::disk($disk)->deleteDirectory($dirPathWillBe));
-                $this->info('run command again.');
                 return Output::SUCCESS;
             }
 
-            return Output::FAILURE;
+            if ($mod === self::SELECT_NEW_NAME) {
+                $toDir = $this->ask('Write path(equilvant of --to-dir option)', $dirPathWillBe.'(1)');
+
+                return $this->call('put', [
+                    '--dir' => $dirPath,
+                    '--to-dir' => $toDir,
+                    '--disk' => $this->option('disk'),
+                    '--disk-tokens' => $this->option('disk-tokens'),
+                ]);
+            }
         }
 
         $countSteps = FileManager::countAllNestedFiles($dirPath) + FileManager::countNestedEmptyFolders($dirPath);
 
         $this->info("Uploading to disk: <comment>{$disk}</comment>, path: <comment>{$dirPathWillBe}/</comment>");
-        $this->newLine();
 
         if ($countSteps === 0) {
             $this->error($dirPath.' Does not have any file or folder.');
             return Output::FAILURE;
         }
 
+        if ($mod === self::REPLACE_IT) {
+            $tempUploadedDirName = uniqid().uniqid().'.tmp';
+            $this->tempUploadedDirName = $tempUploadedDirName;
+            $this->warn("Don't remove {$tempUploadedDirName}, it will be remove after upload.");
+
+            $this->task("<comment>moving {$this->dirPathWillBe}/ to {$tempUploadedDirName}</comment>", fn() =>
+                $this->failWhen(
+                    ! Storage::disk($this->disk)->move($this->dirPathWillBe, $tempUploadedDirName),
+                    "Counldn't create directory in disk path {$tempUploadedDirName}. Check your connection, or set disk authorization tokens."
+                )
+            );
+        }
+
+        $this->newLine();
+
         $this->progressBar = $this->editProgressBar($countSteps);
         $this->progressBar->start();
 
         try {
-            $this->uploadFolder($dirPath, $dirPath);
+            $this->manageUpload($mod, $dirPath);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return Output::FAILURE;
@@ -129,26 +163,217 @@ class PutCommand extends Command
         $this->newLine();
         $totalSize = readable_size($this->totalUploadedBytes);
 
-        $this->info("Uploaded {$dirPath} to {$dirPathWillBe} successfully.");
-        $this->info("total uploaded file size: {$totalSize}");
+        if ($mod === self::REPLACE_IT) {
+            $this->task("<comment>removing {$this->tempUploadedDirName}</comment>", fn() =>
+                $this->failWhen(
+                    ! Storage::disk($this->disk)->deleteDirectory($this->tempUploadedDirName),
+                    "Counldn't delete directory in disk path {$this->tempUploadedDirName}. Check your connection, or set disk authorization tokens."
+                )
+            );
+        }
+
+        $this->info("Uploaded <comment>{$dirPath}</comment> to <comment>{$dirPathWillBe}/</comment> successfully.");
+        $this->info("total uploaded file size: <comment>{$totalSize}</comment>");
 
         return Output::SUCCESS;
     }
 
-    private function customTask(string $name, \Closure $closure): bool
+    private function getMod(): string
     {
-        $this->output->write($name);
-        $result = $closure();
+        $mod = PutCommand::UPLOAD_DIRECTLY;
 
-        if ($result === false) {
-            $this->output->write(': <error>failed</error>');
-        } else {
-            $this->output->write(': <info>✔</info>');
+        if ($this->option('merge') === true) {
+            $mod = PutCommand::MERGE_IT;
+        }
+        if ($this->option('replace') === true) {
+            $mod = PutCommand::REPLACE_IT;
+        }
+        if ($mod === PutCommand::UPLOAD_DIRECTLY) {
+            $mod = $this->choice(
+                "Directory <comment>{$this->dirPathWillBe}</comment> exists in disk <comment>{$this->disk}</comment>",
+                [self::DELETE_FROM_DISK, self::SELECT_NEW_NAME, self::REPLACE_IT, self::MERGE_IT]
+            );
         }
 
-        $this->newLine();
+        return $mod;
+    }
 
-        return $result === false ? false : true;
+    private function manageUpload(string $mod, string $dirPath): void
+    {
+        if ($mod === self::UPLOAD_DIRECTLY) {
+            $this->uploadFolder($dirPath, $dirPath);
+            return;
+        }
+        if ($mod === self::REPLACE_IT) {
+           $this->uploadReplaceFolder($dirPath, $dirPath, $this->tempUploadedDirName);
+            return;
+        }
+        if ($mod === self::MERGE_IT) {
+            $this->uploadMergeFolder($dirPath, $dirPath);
+            return;
+        }
+    }
+
+    /**
+     * Replaces directory with previously uploaded one.
+     * Files that are same with previously uploaded ones, won't be upload again(uses uploaded one).
+     *
+     * @param  string $dir
+     * @param  string $baseDirPath
+     * @param  string $tempUploadedDirName
+     * @return void
+     */
+    public function uploadReplaceFolder(string $dir, string $baseDirPath, string $tempUploadedDirName): void
+    {
+        $readableDir = (string) str($dir)->replace(
+            str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR), basename($baseDirPath)
+        );
+
+        $allFiles = FileManager::allFiles($dir);
+        $allDirs = FileManager::allDir($dir);
+
+        if (count($allFiles) === 0 and count($allDirs) === 0) {
+            $this->writeMessageNL(" <info>mkdir</info> <comment>$readableDir</comment>");
+            $this->uploadEmptyDir($dir, $baseDirPath);
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+            $this->progressBar->advance();
+        }
+
+        foreach ($allFiles as $file) {
+            $diskFilePath = str($file)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                $tempUploadedDirName
+            );
+
+            $this->uploadFileIfNotExistsOrNotSame($file, $diskFilePath, $baseDirPath, true);
+
+            $this->progressBar->advance();
+        }
+
+        foreach ($allDirs as $dir) {
+            $this->uploadReplaceFolder($dir, $baseDirPath, $tempUploadedDirName);
+        }
+    }
+
+    /**
+     * Uploads new files, or files that are different with previously uploaded ones.
+     * Creates empty directories that aren't exists.
+     *
+     * @param  string $dir
+     * @param  string $baseDirPath
+     * @return void
+     */
+    private function uploadMergeFolder(string $dir, string $baseDirPath): void
+    {
+        $readableDir = (string) str($dir)->replace(
+            str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR), basename($baseDirPath)
+        );
+
+        $allFiles = FileManager::allFiles($dir);
+        $allDirs = FileManager::allDir($dir);
+
+        if (count($allFiles) === 0 and count($allDirs) === 0) {
+            $diskPath = str($dir)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                $this->dirPathWillBe
+            );
+
+            $this->writeMessageNL(" Checking dir <comment>$readableDir</comment>");
+            $dirExistsInDisk = Storage::disk($this->disk)->directoryExists($diskPath);
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+
+            if (! $dirExistsInDisk) {
+                $this->writeMessageNL(" <info>mkdir</info> <comment>$readableDir</comment>");
+                $this->uploadEmptyDir($dir, $baseDirPath);
+                $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+            }
+
+            $this->progressBar->advance();
+        }
+
+        foreach ($allFiles as $file) {
+            $diskFilePath = str($file)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                $this->dirPathWillBe
+            );
+
+            $this->uploadFileIfNotExistsOrNotSame($file, $diskFilePath, $baseDirPath);
+
+            $this->progressBar->advance();
+        }
+
+        foreach ($allDirs as $dir) {
+            $this->uploadMergeFolder($dir, $baseDirPath);
+        }
+    }
+
+    private function uploadFileIfNotExistsOrNotSame(
+        string $file,
+        string $diskFilePath,
+        string $baseDirPath,
+        bool $moveDiskFilePathToFilePathWhenFileNotUploaded = false
+    ): void
+    {
+        $readableFile = (string) str($file)->replace(
+            str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+            basename($baseDirPath)
+        );
+        $fileSize = readable_size(filesize($file));
+
+        $this->writeMessageNL(" Checking file <comment>{$readableFile}({$fileSize})</comment>");
+        $fileExistsInDisk = Storage::disk($this->disk)->exists($diskFilePath);
+        $filesAreSame = true;
+        if ($fileExistsInDisk) {
+            $filesAreSame = $this->filesAreSame($file, fileOnDisk: $diskFilePath);
+        }
+        $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+
+        if (! $fileExistsInDisk or ! $filesAreSame) {
+            $this->writeMessageNL(" <info>Uploading</info> <comment>{$readableFile}({$fileSize})</comment>");
+            $this->uploadFile($file, $baseDirPath);
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+        } else if ($moveDiskFilePathToFilePathWhenFileNotUploaded) {
+            $filePath = str($file)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                $this->dirPathWillBe
+            );
+            $this->writeMessageNL(" <info>moving</info> <comment>{$diskFilePath} to {$filePath}</comment>");
+
+            $this->failWhen(
+                ! Storage::disk($this->disk)->move($diskFilePath, $filePath),
+                "Counldn't move file {$diskFilePath} to {$filePath}. Check your connection, or set disk authorization tokens."
+            );
+            //test working with to-dir
+            $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
+        }
+    }
+
+    private function filesAreSame(string $file, string $fileOnDisk): bool
+    {
+        $fileOnDiskSize = Storage::disk($this->disk)->size($fileOnDisk);
+        $fileSize = filesize($file);
+
+        if ($fileOnDiskSize === 1) {
+            if (trim(Storage::disk($this->disk)->get($fileOnDisk)) === '' and $fileSize === 0) {
+                return true;
+            }
+        }
+
+        if ($fileSize != $fileOnDiskSize) {
+            return false;
+        }
+
+        $fileContent = file_get_contents($file);
+        $fileOnDiskContent = Storage::disk($this->disk)->get($fileOnDisk);
+
+        if (sha1($fileContent) === sha1($fileOnDiskContent)) {
+            return true;
+        }
+        if (md5($fileContent) === md5($fileOnDiskContent)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function uploadFolder(string $dir, string $baseDirPath): void
@@ -214,14 +439,14 @@ class PutCommand extends Command
 
     private function uploadEmptyDir(string $dir, string $baseDirPath): void
     {
-        $path = str($dir)->replace(
+        $diskPath = str($dir)->replace(
             str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
             $this->dirPathWillBe
         );
 
         $this->failWhen(
-            ! Storage::disk($this->disk)->makeDirectory($path),
-            "Counldn't create directory in disk path {$path}. Check your connection, or set disk authorization tokens."
+            ! Storage::disk($this->disk)->makeDirectory($diskPath),
+            "Counldn't create directory in disk path {$diskPath}. Check your connection, or set disk authorization tokens."
         );
     }
 
@@ -242,6 +467,8 @@ class PutCommand extends Command
             ! Storage::disk($this->disk)->put($filePath, $fileContent),
             "Counldn't create file in disk path {$filePath}. Check your connection, or set disk authorization tokens."
         );
+
+        $this->totalUploadedBytes += filesize($file);
     }
 
     private function manageDiskTokens(?string $tokensPath, string $disk): bool

@@ -16,7 +16,7 @@
 //      *
 //      * @var string
 //      */
-//     protected $signature = 'repo:add {--repo-path=} {--to-dir=} {--fetch-branches=true}';
+//     protected $signature = 'repo:add {--repo-path=} {--to-dir=} {--fetch-branches}';
 
 //     /**
 //      * The description of the command.

@@ -34,7 +34,14 @@ function rmdir_recursive(string $dir): void
 function dirsize(string $dir): int
 {
     $bytes = 0;
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    $dir = realpath($dir);
+
+    if(! is_dir($dir)){
+        return 0;
+    }
+
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
+
     foreach ($iterator as $i)
     {
       $bytes += $i->getSize();
@@ -50,7 +57,7 @@ function readable_size($size): string
         $size_kb = round($size/1024, 1);
         return "{$size_kb} KB";
     } else {
-        $size_mb = round($size/1048576);
+        $size_mb = round($size/1000000, 1);
         $size_gb = round($size_mb/1024, 1);
 
         if ($size_gb >= 1) {
