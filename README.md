@@ -1,4 +1,4 @@
-This package clones(mirrored) repos from specified server(s), then repos can be put to some disk like dropbox.
+This package clones/fetches(mirrored) repos from specified server(s), then repos can be put to some disk like dropbox.
 
 Currently available disk: dropbox.
 
