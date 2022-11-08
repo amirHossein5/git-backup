@@ -97,7 +97,7 @@ class PutCommand extends Command
         $this->info('Checking disk...');
 
         try {
-            $exists = Storage::disk($disk)->exists($dirPathWillBe);
+            $exists = Storage::disk($disk)->directoryExists($dirPathWillBe);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return Output::FAILURE;
