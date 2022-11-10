@@ -293,7 +293,7 @@ it('when dir already exists, replaces dir', function () {
     Storage::disk('local')->put('will-be-replace/text.txt', '/');
     Storage::disk('local')->put('will-be-replace/another/text.txt', 'another/');
     Storage::disk('local')->put('will-be-replace/some/text.txt', 'some/');
-    Storage::disk('local')->put('will-be-replace/some/dir/text.txt', 'some/dir/text.txt');
+    Storage::disk('local')->put('will-be-replace/some/dir/text.txt', 'old content');
 
     expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp"))
         ->toBe(Command::SUCCESS);
@@ -335,7 +335,7 @@ it('when dir already exists, merges dir', function () {
 
     Storage::disk('local')->makeDirectory('will-be-merge/some/empty');
     Storage::disk('local')->put('will-be-merge/text.txt', '/');
-    Storage::disk('local')->put('will-be-merge/some/dir/text.txt', 'some/dir/text.txt');
+    Storage::disk('local')->put('will-be-merge/some/dir/text.txt', 'old content');
 
     expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp"))
         ->toBe(Command::SUCCESS);
