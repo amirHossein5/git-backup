@@ -23,7 +23,8 @@ class RepositoryManager
 
     public static function filterServersBy(array $servers, string $matches): array
     {
-        return collect($servers)->filter(fn ($server) => str($server['name'])->contains($matches)
+        return collect($servers)->filter(
+            fn ($server) => str($server['name'])->contains($matches)
         )->toArray();
     }
 
@@ -33,7 +34,7 @@ class RepositoryManager
 
         self::addFetchedAllBranchesOfRepos($repoPath);
 
-        system("cd {$repoPath} && git fetch --all; git pull --all;".self::getCommandToFetchAllBranches());
+        system("cd {$repoPath} && git fetch --all; git pull --all;" . self::getCommandToFetchAllBranches());
     }
 
     public static function isGitRepo(string $dir): bool
@@ -49,7 +50,7 @@ class RepositoryManager
     {
         $cloneTo = pathable($cloneTo);
 
-        if (is_dir($dir = $cloneTo.DIRECTORY_SEPARATOR.$repoName)) {
+        if (is_dir($dir = $cloneTo . DIRECTORY_SEPARATOR . $repoName)) {
             return self::fetch($dir);
         }
 
@@ -70,10 +71,10 @@ class RepositoryManager
 
         if ($response->failed()) {
             $message = isset($response->json()['message'])
-                ? 'Message: '.$response->json()['message']
+                ? 'Message: ' . $response->json()['message']
                 : null;
 
-            throw new \Exception('Request failed with status code: '.$response->status().'. '.$message);
+            throw new \Exception('Request failed with status code: ' . $response->status() . '. ' . $message);
         }
 
         return collect(data_get($response->json(), $pattern))->filter();
@@ -88,7 +89,7 @@ class RepositoryManager
             $command .= 'echo && ';
         }
 
-        system($command.$gitCloneCommand);
+        system($command . $gitCloneCommand);
 
         self::addClonedReposTo($cloneTo);
     }
