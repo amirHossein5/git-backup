@@ -10,13 +10,13 @@ it('has required options', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: ".pathable("some/not/found"))
+        ->expectsOutput("Counld'nt find config file in path: ".pathable('some/not/found'))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error if config file not found', function () {
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: ".pathable("some/not/found"))
+        ->expectsOutput("Counld'nt find config file in path: ".pathable('some/not/found'))
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -344,7 +344,7 @@ it('filters repos', function () {
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 0')
-        ->expectsOutput("path to repos: ".pathable($to))
+        ->expectsOutput('path to repos: '.pathable($to))
         ->assertExitCode(Command::SUCCESS);
 });
 

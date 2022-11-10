@@ -42,7 +42,7 @@ it('shows error when passed disk tokens not exists or is dir', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan("put --disk local --disk-tokens {$dir} --dir={$dir}")
-        ->expectsOutput("expected json found directory: ".pathable($dir))
+        ->expectsOutput('expected json found directory: '.pathable($dir))
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -98,8 +98,8 @@ it('shows error when dir does not have any file or folder', function () {
     $this->artisan("put --disk local --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput("Uploading to disk: local, path: ".pathable($dirName).'/')
-        ->expectsOutput(pathable($dir)." Does not have any file or folder.")
+        ->expectsOutput('Uploading to disk: local, path: '.pathable($dirName).'/')
+        ->expectsOutput(pathable($dir).' Does not have any file or folder.')
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -230,7 +230,7 @@ test('test when not passing disk token', function () {
         ->expectsOutput('Checking disk...')
         ->expectsOutput('Uploading to disk: dropbox, path: git-backup'.DIRECTORY_SEPARATOR)
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Counldn't create file in disk path ".pathable("git-backup/.editorconfig").". Check your connection, or set disk authorization tokens.")
+        ->expectsOutput("Counldn't create file in disk path ".pathable('git-backup/.editorconfig').'. Check your connection, or set disk authorization tokens.')
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -249,7 +249,7 @@ test('test when disk tokens are not valid', function () {
         ->expectsOutput('Checking disk...')
         ->expectsOutput('Uploading to disk: dropbox, path: git-backup'.DIRECTORY_SEPARATOR)
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Counldn't create file in disk path ".pathable("git-backup/.editorconfig").". Check your connection, or set disk authorization tokens.")
+        ->expectsOutput("Counldn't create file in disk path ".pathable('git-backup/.editorconfig').'. Check your connection, or set disk authorization tokens.')
         ->assertExitCode(Command::FAILURE);
 });
 

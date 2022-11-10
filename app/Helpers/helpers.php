@@ -36,29 +36,30 @@ function dirsize(string $dir): int
     $bytes = 0;
     $dir = realpath($dir);
 
-    if(! is_dir($dir)){
+    if (! is_dir($dir)) {
         return 0;
     }
 
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
 
-    foreach ($iterator as $i)
-    {
-      $bytes += $i->getSize();
+    foreach ($iterator as $i) {
+        $bytes += $i->getSize();
     }
+
     return $bytes;
 }
 
 function readable_size($size): string
 {
-    if($size < 1024) {
+    if ($size < 1024) {
         return "{$size} bytes";
-    } elseif($size < 1048576) {
-        $size_kb = round($size/1024, 1);
+    } elseif ($size < 1048576) {
+        $size_kb = round($size / 1024, 1);
+
         return "{$size_kb} KB";
     } else {
-        $size_mb = round($size/1000000, 1);
-        $size_gb = round($size_mb/1024, 1);
+        $size_mb = round($size / 1000000, 1);
+        $size_gb = round($size_mb / 1024, 1);
 
         if ($size_gb >= 1) {
             return "{$size_gb} GB";
