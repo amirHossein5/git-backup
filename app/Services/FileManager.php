@@ -27,7 +27,7 @@ class FileManager
         $allFiles = [];
 
         foreach ($ffs as $ff) {
-            $ff = $dir.DIRECTORY_SEPARATOR.$ff;
+            $ff = $dir . DIRECTORY_SEPARATOR . $ff;
 
             if (! is_dir($ff) and file_exists($ff)) {
                 $allFiles[] = $ff;
@@ -60,7 +60,7 @@ class FileManager
         $allFolders = [];
 
         foreach ($ffs as $ff) {
-            $ff = $dir.DIRECTORY_SEPARATOR.$ff;
+            $ff = $dir . DIRECTORY_SEPARATOR . $ff;
 
             if (is_dir($ff) and file_exists($ff)) {
                 $allFolders[] = $ff;
