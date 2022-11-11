@@ -80,8 +80,7 @@ If directory that you're uploading already exists in the specfied disk, then som
     - uploads new files, or files that are different with previously uploaded ones
     - creates empty directories that aren't exists in uploaded folder
 - upload remained things
-    - uploads files that haven't been created
-    - directories that aren't exists.
+    - uploads files, and directories that aren't exists.
 
 ### Specifying destination path
 
