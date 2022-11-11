@@ -431,3 +431,48 @@ it('when dir already exists, merges dir', function () {
     expect(Storage::disk('local')->deleteDirectory('will-be-merge'))->toBeTrue();
     expect(glob('*.tmp'))->toHaveLength(0);
 });
+
+it('when dir already exists, uploads remained things', function () {
+    $dir = base_path('upload-remains');
+    Storage::disk('local')->deleteDirectory('tests/temp');
+    expect(glob('*.tmp'))->toHaveLength(0);
+
+    Storage::disk('local')->makeDirectory('upload-remains/some/empty');
+    Storage::disk('local')->put('upload-remains/text.txt', '/');
+    Storage::disk('local')->put('upload-remains/some/dir/text.txt', 'old content');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp"))
+        ->toBe(Command::SUCCESS);
+
+    Storage::disk('local')->makeDirectory('upload-remains/another');
+    Storage::disk('local')->put('upload-remains/some/new.txt', 'new file');
+    Storage::disk('local')->put('upload-remains/some/dir/text.txt', 'new content');
+
+    expect(Artisan::call("put --disk local --dir={$dir} --to-dir tests/temp --upload-remained"))
+        ->toBe(Command::SUCCESS);
+
+    expect(FileManager::allDir('tests/temp'))->toHaveLength(2);
+    expect(FileManager::allFiles('tests/temp'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/another'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/another'))->toHaveLength(0);
+
+    expect(FileManager::allDir('tests/temp/some'))->toHaveLength(2);
+    expect(FileManager::allFiles('tests/temp/some'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/some/dir'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/some/dir'))->toHaveLength(1);
+
+    expect(FileManager::allDir('tests/temp/some/empty'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp/some/empty'))->toHaveLength(0);
+
+    expect(Storage::disk('local')->get('tests/temp/text.txt'))
+        ->toBe('/');
+    expect(Storage::disk('local')->get('tests/temp/some/dir/text.txt'))
+        ->toBe('old content');
+    expect(Storage::disk('local')->get('tests/temp/some/new.txt'))
+        ->toBe('new file');
+
+    expect(Storage::disk('local')->deleteDirectory('upload-remains'))->toBeTrue();
+    expect(glob('*.tmp'))->toHaveLength(0);
+});
