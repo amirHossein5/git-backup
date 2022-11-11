@@ -73,7 +73,8 @@ class ConfigReader
     {
         $arrayDot = Arr::dot($decodedJson);
 
-        $useKeys = collect($arrayDot)->filter(fn ($value, $key) => str($key)->explode('.')->filter(fn ($v) => $v === 'use')->count() === 1 &&
+        $useKeys = collect($arrayDot)->filter(
+            fn ($value, $key) => str($key)->explode('.')->filter(fn ($v) => $v === 'use')->count() === 1 &&
             str($key)->explode('.')->contains('use') ||
             str($key)->endsWith('use.from') ||
             str($key)->contains('use.with')
@@ -94,7 +95,8 @@ class ConfigReader
             }
 
             if ($vars->isNotEmpty()) {
-                $vars = $vars->mapWithKeys(fn ($val, $key) => [str_replace($varKey.'.', '', $key) => $val]
+                $vars = $vars->mapWithKeys(
+                    fn ($val, $key) => [str_replace($varKey.'.', '', $key) => $val]
                 )->toArray();
 
                 $decodedUse = self::resolveVars(with: $vars, in: $decodedUse);
