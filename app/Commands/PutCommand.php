@@ -132,7 +132,7 @@ class PutCommand extends Command
             }
 
             if ($mod === self::SELECT_NEW_NAME) {
-                $toDir = $this->ask('Write path(equilvant of --to-dir option)', $dirPathWillBe.'(1)');
+                $toDir = $this->ask('Write path(equilvant of --to-dir option)', $dirPathWillBe . '(1)');
 
                 return $this->call('put', [
                     '--dir' => $dirPath,
@@ -148,13 +148,13 @@ class PutCommand extends Command
         $this->info("Uploading to disk: <comment>{$disk}</comment>, path: <comment>{$dirPathWillBe}/</comment>");
 
         if ($countSteps === 0) {
-            $this->error($dirPath.' Does not have any file or folder.');
+            $this->error($dirPath . ' Does not have any file or folder.');
 
             return Output::FAILURE;
         }
 
         if ($mod === self::REPLACE_IT) {
-            $tempUploadedDirName = uniqid().uniqid().'.tmp';
+            $tempUploadedDirName = uniqid() . uniqid() . '.tmp';
             $this->tempUploadedDirName = $tempUploadedDirName;
             $this->warn("Don't remove {$tempUploadedDirName}, it will be remove after upload.");
 
