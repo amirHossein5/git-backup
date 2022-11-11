@@ -12,7 +12,6 @@ use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class PutCommand extends Command
 {
@@ -82,12 +81,14 @@ class PutCommand extends Command
 
         if (! is_dir($dirPath)) {
             $this->error("Directory not found {$dirPath}");
+
             return Output::FAILURE;
         }
 
         if (! config("filesystems.disks.{$disk}")) {
             $this->error("disk {$disk} not found.");
             $this->line("See available disk list via, {$showDiskCommand}");
+
             return Output::FAILURE;
         }
 
@@ -102,6 +103,7 @@ class PutCommand extends Command
             $exists = Storage::disk($disk)->directoryExists($dirPathWillBe);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+
             return Output::FAILURE;
         }
 
@@ -112,6 +114,7 @@ class PutCommand extends Command
 
             if ($mod === self::DELETE_FROM_DISK) {
                 $this->deleteDir();
+
                 return Output::SUCCESS;
             }
             if ($mod === self::FRESH_DIR) {
@@ -137,6 +140,7 @@ class PutCommand extends Command
 
         if ($countSteps === 0) {
             $this->error($dirPath.' Does not have any file or folder.');
+
             return Output::FAILURE;
         }
 
@@ -145,8 +149,7 @@ class PutCommand extends Command
             $this->tempUploadedDirName = $tempUploadedDirName;
             $this->warn("Don't remove {$tempUploadedDirName}, it will be remove after upload.");
 
-            $this->task("<comment>moving {$this->dirPathWillBe}/ to {$tempUploadedDirName}</comment>", fn() =>
-                $this->failWhen(
+            $this->task("<comment>moving {$this->dirPathWillBe}/ to {$tempUploadedDirName}</comment>", fn () => $this->failWhen(
                     ! Storage::disk($this->disk)->move($this->dirPathWillBe, $tempUploadedDirName),
                     "Counldn't create directory in disk path {$tempUploadedDirName}. Check your connection, or set disk authorization tokens."
                 )
@@ -162,6 +165,7 @@ class PutCommand extends Command
             $this->manageUpload($mod, $dirPath);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+
             return Output::FAILURE;
         }
 
@@ -170,8 +174,7 @@ class PutCommand extends Command
         $totalSize = readable_size($this->totalUploadedBytes);
 
         if ($mod === self::REPLACE_IT) {
-            $this->task("<comment>removing {$this->tempUploadedDirName}</comment>", fn() =>
-                $this->failWhen(
+            $this->task("<comment>removing {$this->tempUploadedDirName}</comment>", fn () => $this->failWhen(
                     ! Storage::disk($this->disk)->deleteDirectory($this->tempUploadedDirName),
                     "Counldn't delete directory in disk path {$this->tempUploadedDirName}. Check your connection, or set disk authorization tokens."
                 )
@@ -216,14 +219,17 @@ class PutCommand extends Command
     {
         if ($mod === self::UPLOAD_DIRECTLY) {
             $this->uploadFolder($dirPath, $dirPath);
+
             return;
         }
         if ($mod === self::REPLACE_IT) {
-           $this->uploadReplaceFolder($dirPath, $dirPath, $this->tempUploadedDirName);
+            $this->uploadReplaceFolder($dirPath, $dirPath, $this->tempUploadedDirName);
+
             return;
         }
         if ($mod === self::MERGE_IT) {
             $this->uploadMergeFolder($dirPath, $dirPath);
+
             return;
         }
     }
@@ -232,9 +238,9 @@ class PutCommand extends Command
      * Replaces directory with previously uploaded one.
      * Files that are same with previously uploaded ones, won't be upload again(uses uploaded one).
      *
-     * @param  string $dir
-     * @param  string $baseDirPath
-     * @param  string $tempUploadedDirName
+     * @param  string  $dir
+     * @param  string  $baseDirPath
+     * @param  string  $tempUploadedDirName
      * @return void
      */
     public function uploadReplaceFolder(string $dir, string $baseDirPath, string $tempUploadedDirName): void
@@ -273,8 +279,8 @@ class PutCommand extends Command
      * Uploads new files, or files that are different with previously uploaded ones.
      * Creates empty directories that aren't exists.
      *
-     * @param  string $dir
-     * @param  string $baseDirPath
+     * @param  string  $dir
+     * @param  string  $baseDirPath
      * @return void
      */
     private function uploadMergeFolder(string $dir, string $baseDirPath): void
@@ -326,8 +332,7 @@ class PutCommand extends Command
         string $diskFilePath,
         string $baseDirPath,
         bool $moveDiskFilePathToFilePathWhenFileNotUploaded = false
-    ): void
-    {
+    ): void {
         $readableFile = (string) str($file)->replace(
             str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
             basename($baseDirPath)
@@ -346,7 +351,7 @@ class PutCommand extends Command
             $this->writeMessageNL(" <info>Uploading</info> <comment>{$readableFile}({$fileSize})</comment>");
             $this->uploadFile($file, $baseDirPath);
             $this->cursor->clearLine()->moveUp()->clearLine()->moveUp();
-        } else if ($moveDiskFilePathToFilePathWhenFileNotUploaded) {
+        } elseif ($moveDiskFilePathToFilePathWhenFileNotUploaded) {
             $filePath = str($file)->replace(
                 str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
                 $this->dirPathWillBe
@@ -429,6 +434,7 @@ class PutCommand extends Command
     {
         $progressBar = new ProgressBar($this->output, $len);
         $progressBar->setFormat(' %current%/%max%  %percent:3s%%    (%elapsed:6s%/%estimated:-6s%)');
+
         return $progressBar;
     }
 
@@ -473,7 +479,7 @@ class PutCommand extends Command
 
         $fileContent = file_get_contents($file);
 
-        if ($fileContent  === '') {
+        if ($fileContent === '') {
             $fileContent = ' ';
         }
 
@@ -493,9 +499,11 @@ class PutCommand extends Command
             } catch (JsonDecodeException $e) {
                 $this->error('Error when decoding json:');
                 $this->error($e->getMessage());
+
                 return false;
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->error($e->getMessage());
+
                 return false;
             }
 
