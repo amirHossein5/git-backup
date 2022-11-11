@@ -48,7 +48,7 @@ class GetCommand extends Command
         $configPath = pathable($this->option('config'));
 
         if (! file_exists($configPath)) {
-            $this->error("Counld'nt find config file in path: " . $configPath);
+            $this->error("Counld'nt find config file in path: ".$configPath);
 
             return Output::FAILURE;
         }
@@ -77,7 +77,7 @@ class GetCommand extends Command
         foreach ($config->servers() as $data) {
             $this->newLine();
             $this->info(
-                'Collecting repository names for: ' .
+                'Collecting repository names for: '.
                 "<comment>{$data['name']}</comment>"
             );
 
@@ -107,7 +107,7 @@ class GetCommand extends Command
             $this->newLine();
 
             if (! is_dir($cloneTo)) {
-                $this->error('Directory not found: ' . $cloneTo);
+                $this->error('Directory not found: '.$cloneTo);
 
                 continue;
             }
@@ -115,7 +115,7 @@ class GetCommand extends Command
             $this->withProgressBar($repoNames, function ($repoName) use ($data, $cloneTo) {
                 $repoName = str($repoName)->endsWith('.git')
                     ? $repoName
-                    : $repoName . '.git';
+                    : $repoName.'.git';
 
                 $output = RepositoryManager::cloneOrFetch(
                     $cloneTo,
@@ -155,7 +155,7 @@ class GetCommand extends Command
 
             return false;
         } catch (RequiredKeyMissing $e) {
-            $this->error('required config key ' . $e->getMessage() . ' missing.');
+            $this->error('required config key '.$e->getMessage().' missing.');
 
             return false;
         } catch (FileNotFoundException $e) {

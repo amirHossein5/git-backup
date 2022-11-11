@@ -15,20 +15,20 @@ it('has required options', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan('put --disk dropbox --dir=some/not/found/path')
-        ->expectsOutput('Directory not found ' . pathable('some/not/found/path'))
+        ->expectsOutput('Directory not found '.pathable('some/not/found/path'))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error when direcotry not found', function () {
     $this->artisan('put --disk dropbox --dir=some/not/found/path')
-        ->expectsOutput('Directory not found ' . pathable('some/not/found/path'))
+        ->expectsOutput('Directory not found '.pathable('some/not/found/path'))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error when disk not found', function () {
     $dir = base_path();
 
-    $this->artisan('put --disk notfound --dir=' . $dir)
+    $this->artisan('put --disk notfound --dir='.$dir)
         ->expectsOutput('disk notfound not found.')
         ->expectsOutput('See available disk list via, php backup show:disk')
         ->assertExitCode(Command::FAILURE);
@@ -38,17 +38,17 @@ it('shows error when passed disk tokens not exists or is dir', function () {
     $dir = base_path();
 
     $this->artisan("put --disk local --disk-tokens /some/not/found --dir={$dir}")
-        ->expectsOutput('File not found at: ' . pathable('/some/not/found'))
+        ->expectsOutput('File not found at: '.pathable('/some/not/found'))
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan("put --disk local --disk-tokens {$dir} --dir={$dir}")
-        ->expectsOutput('expected json found directory: ' . pathable($dir))
+        ->expectsOutput('expected json found directory: '.pathable($dir))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error when could not decode disk tokens json', function () {
     $dir = base_path();
-    $diskTokensPath = $this->tempDirPath . DIRECTORY_SEPARATOR . 'disk-tokens.json';
+    $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', '
     {
         somekey
@@ -63,7 +63,7 @@ it('shows error when could not decode disk tokens json', function () {
 
 it('sets disk tokens correctly', function () {
     $dir = base_path('stubs');
-    $diskTokensPath = $this->tempDirPath . DIRECTORY_SEPARATOR . 'disk-tokens.json';
+    $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOT'
     {
         notexists: sometoken
@@ -92,23 +92,23 @@ it('sets disk tokens correctly', function () {
 
 it('shows error when dir does not have any file or folder', function () {
     $dirName = uniqid();
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName);
-    $dir = Storage::disk('local')->path('tests/temp/' . $dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
+    $dir = Storage::disk('local')->path('tests/temp/'.$dirName);
 
     $this->artisan("put --disk local --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput('Uploading to disk: local, path: ' . pathable($dirName) . '/')
-        ->expectsOutput(pathable($dir) . ' Does not have any file or folder.')
+        ->expectsOutput('Uploading to disk: local, path: '.pathable($dirName).'/')
+        ->expectsOutput(pathable($dir).' Does not have any file or folder.')
         ->assertExitCode(Command::FAILURE);
 });
 
 it('it will upload everything successfully', function () {
     $dirName = uniqid();
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName);
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/empty/folder');
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/not/folder');
-    $dir = Storage::disk('local')->path('tests/temp/' . $dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/empty/folder');
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/not/folder');
+    $dir = Storage::disk('local')->path('tests/temp/'.$dirName);
 
     Storage::disk('local')
         ->put("tests/temp/{$dirName}/some/not/file.txt", 'some/not/file.txt');
@@ -145,17 +145,17 @@ it('it will upload everything successfully', function () {
     expect(count(FileManager::allFiles("$dirName/some/not/folder")))->toBe(1);
     expect(FileManager::allFiles("$dirName/some/not/folder")[0])->toBe(pathable("$dirName/some/not/folder/file.txt"));
 
-    expect(file_get_contents(base_path($dirName . '/file.txt')))->toBe('rest');
-    expect(file_get_contents(base_path($dirName . '/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
-    expect(file_get_contents(base_path($dirName . '/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/file.txt')))->toBe('rest');
+    expect(file_get_contents(base_path($dirName.'/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
 
     expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
 });
 
 it('it will upload empty file', function () {
     $dirName = uniqid();
-    Storage::disk('local')->put('tests/temp/' . $dirName . '/file.txt', '');
-    $dirPath = Storage::disk('local')->path('tests/temp/' . $dirName);
+    Storage::disk('local')->put('tests/temp/'.$dirName.'/file.txt', '');
+    $dirPath = Storage::disk('local')->path('tests/temp/'.$dirName);
 
     Artisan::call("put --disk local --dir={$dirPath}");
 
@@ -163,17 +163,17 @@ it('it will upload empty file', function () {
 
     expect(count(FileManager::allDir($uploadedPath)))->toBe(0);
     expect(count(FileManager::allFiles($uploadedPath)))->toBe(1);
-    expect(file_get_contents($uploadedPath . '/file.txt'))->toBe(' ');
+    expect(file_get_contents($uploadedPath.'/file.txt'))->toBe(' ');
 
     expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
 });
 
 it('it will upload everything successfully on specified folder', function () {
     $dirName = uniqid();
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName);
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/empty/folder');
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/not/folder');
-    $dir = Storage::disk('local')->path('tests/temp/' . $dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/empty/folder');
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/not/folder');
+    $dir = Storage::disk('local')->path('tests/temp/'.$dirName);
     $toDir = 'somenotprevoiuslycreatedfolder';
 
     Storage::disk('local')->deleteDirectory($toDir);
@@ -215,9 +215,9 @@ it('it will upload everything successfully on specified folder', function () {
     expect(count(FileManager::allFiles("$dirName/some/not/folder")))->toBe(1);
     expect(FileManager::allFiles("$dirName/some/not/folder")[0])->toBe(pathable("$dirName/some/not/folder/file.txt"));
 
-    expect(file_get_contents(base_path($dirName . '/file.txt')))->toBe('rest');
-    expect(file_get_contents(base_path($dirName . '/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
-    expect(file_get_contents(base_path($dirName . '/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/file.txt')))->toBe('rest');
+    expect(file_get_contents(base_path($dirName.'/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
 
     expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
 });
@@ -228,15 +228,15 @@ test('test when not passing disk token', function () {
     $this->artisan("put --disk dropbox --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput('Uploading to disk: dropbox, path: git-backup' . DIRECTORY_SEPARATOR)
+        ->expectsOutput('Uploading to disk: dropbox, path: git-backup'.DIRECTORY_SEPARATOR)
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Counldn't create file in disk path " . pathable('git-backup/.editorconfig') . '. Check your connection, or set disk authorization tokens.')
+        ->expectsOutput("Counldn't create file in disk path ".pathable('git-backup/.editorconfig').'. Check your connection, or set disk authorization tokens.')
         ->assertExitCode(Command::FAILURE);
 });
 
 test('test when disk tokens are not valid', function () {
     $dir = base_path();
-    $diskTokensPath = $this->tempDirPath . DIRECTORY_SEPARATOR . 'disk-tokens.json';
+    $diskTokensPath = $this->tempDirPath.DIRECTORY_SEPARATOR.'disk-tokens.json';
     Storage::disk('local')->put('tests/temp/disk-tokens.json', <<<'EOL'
     {
         key: some key
@@ -247,18 +247,18 @@ test('test when disk tokens are not valid', function () {
     $this->artisan("put --disk dropbox --disk-tokens {$diskTokensPath} --dir={$dir}")
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Checking disk...')
-        ->expectsOutput('Uploading to disk: dropbox, path: git-backup' . DIRECTORY_SEPARATOR)
+        ->expectsOutput('Uploading to disk: dropbox, path: git-backup'.DIRECTORY_SEPARATOR)
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput("Counldn't create file in disk path " . pathable('git-backup/.editorconfig') . '. Check your connection, or set disk authorization tokens.')
+        ->expectsOutput("Counldn't create file in disk path ".pathable('git-backup/.editorconfig').'. Check your connection, or set disk authorization tokens.')
         ->assertExitCode(Command::FAILURE);
 });
 
 it('when dir already exists, freshes dir', function () {
     $dirName = uniqid();
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName);
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/empty/folder');
-    Storage::disk('local')->makeDirectory('tests/temp/' . $dirName . '/some/not/folder');
-    $dir = Storage::disk('local')->path('tests/temp/' . $dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/empty/folder');
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/not/folder');
+    $dir = Storage::disk('local')->path('tests/temp/'.$dirName);
     $toDir = 'somenotprevoiuslycreatedfolder';
 
     Storage::disk('local')->deleteDirectory($toDir);
@@ -305,9 +305,9 @@ it('when dir already exists, freshes dir', function () {
     expect(count(FileManager::allFiles("$dirName/some/not/folder")))->toBe(1);
     expect(FileManager::allFiles("$dirName/some/not/folder")[0])->toBe(pathable("$dirName/some/not/folder/file.txt"));
 
-    expect(file_get_contents(base_path($dirName . '/file.txt')))->toBe('test');
-    expect(file_get_contents(base_path($dirName . '/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
-    expect(file_get_contents(base_path($dirName . '/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/file.txt')))->toBe('test');
+    expect(file_get_contents(base_path($dirName.'/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
 
     expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
 });
