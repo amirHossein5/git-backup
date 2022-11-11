@@ -23,7 +23,8 @@ class RepositoryManager
 
     public static function filterServersBy(array $servers, string $matches): array
     {
-        return collect($servers)->filter(fn ($server) => str($server['name'])->contains($matches)
+        return collect($servers)->filter(
+            fn ($server) => str($server['name'])->contains($matches)
         )->toArray();
     }
 
