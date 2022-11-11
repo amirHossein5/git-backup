@@ -10,13 +10,13 @@ it('has required options', function () {
         ->assertExitCode(Command::FAILURE);
 
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: ".pathable('some/not/found'))
+        ->expectsOutput("Counld'nt find config file in path: " . pathable('some/not/found'))
         ->assertExitCode(Command::FAILURE);
 });
 
 it('shows error if config file not found', function () {
     $this->artisan('repo:get --config some/not/found')
-        ->expectsOutput("Counld'nt find config file in path: ".pathable('some/not/found'))
+        ->expectsOutput("Counld'nt find config file in path: " . pathable('some/not/found'))
         ->assertExitCode(Command::FAILURE);
 });
 
@@ -29,7 +29,7 @@ it('shows error if cannot decode config', function () {
 
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('Undefined array key "servers"')
         ->assertExitCode(Command::FAILURE);
 
@@ -39,7 +39,7 @@ it('shows error if cannot decode config', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('Error when decoding json: ')
         ->expectsOutputToContain("Found '}' where a key name was expected")
         ->assertExitCode(Command::FAILURE);
@@ -54,7 +54,7 @@ it('shows error if required config key missing', function () {
 
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('Undefined array key "servers"')
         ->assertExitCode(Command::FAILURE);
 
@@ -68,7 +68,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('required config key servers.*.name missing.')
         ->assertExitCode(Command::FAILURE);
 
@@ -82,7 +82,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('required config key servers.*.clone.to missing.')
         ->assertExitCode(Command::FAILURE);
 
@@ -99,7 +99,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('required config key servers.*.clone.using missing.')
         ->assertExitCode(Command::FAILURE);
 
@@ -117,7 +117,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('required config key repo-names.from-api missing.')
         ->assertExitCode(Command::FAILURE);
 
@@ -138,7 +138,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput('required config key repo-names.pattern missing.')
         ->assertExitCode(Command::FAILURE);
 
@@ -160,7 +160,7 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutputToContain('cURL error 6: Could not resolve host: smoenotfoundserver.notfound')
@@ -183,17 +183,17 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('1 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: '.pathable('/some/path'))
+        ->expectsOutput('Directory not found: ' . pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 1')
-        ->expectsOutput('path to repos: '.pathable('/some/path'))
+        ->expectsOutput('path to repos: ' . pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -215,17 +215,17 @@ it('shows error if required config key missing', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('2 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: '.pathable('/some/path'))
+        ->expectsOutput('Directory not found: ' . pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 2')
-        ->expectsOutput('path to repos: '.pathable('/some/path'))
+        ->expectsOutput('path to repos: ' . pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 });
 
@@ -249,17 +249,17 @@ it('skips server when clone.to directory not found', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('1 repository found. Cloning/Fetching...')
         ->expectsOutput(PHP_EOL)
-        ->expectsOutput('Directory not found: '.pathable('/some/path'))
+        ->expectsOutput('Directory not found: ' . pathable('/some/path'))
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 1')
-        ->expectsOutput('path to repos: '.pathable('/some/path'))
+        ->expectsOutput('path to repos: ' . pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
 });
 
@@ -283,7 +283,7 @@ it('shows error when no server found', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --matches notfoundserver --config '.$pathToConfig)
+    $this->artisan('repo:get --matches notfoundserver --config ' . $pathToConfig)
         ->expectsOutput('No server found!')
         ->assertExitCode(Command::FAILURE);
 });
@@ -310,7 +310,7 @@ it('fails on wrong server token', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --config '.$pathToConfig)
+    $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('Request failed with status code: 401. Message: Bad credentials')
@@ -338,13 +338,13 @@ it('filters repos', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --repo-matches notfoundrepo --config '.$pathToConfig)
+    $this->artisan('repo:get --repo-matches notfoundrepo --config ' . $pathToConfig)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('0 repository found. Cloning/Fetching...')
         ->expectsOutput('Clone/Fetch summary:')
         ->expectsOutput('name: some name')
         ->expectsOutput('found repos count: 0')
-        ->expectsOutput('path to repos: '.pathable($to))
+        ->expectsOutput('path to repos: ' . pathable($to))
         ->assertExitCode(Command::SUCCESS);
 });
 
@@ -370,7 +370,7 @@ it('gets filtered repo', function () {
     }
     EOL);
 
-    expect(Artisan::call('repo:get --repo-matches full-screen-js-codes --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --repo-matches full-screen-js-codes --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
     expect(count(FileManager::allDir($to)))
         ->toBe(1);
@@ -411,7 +411,7 @@ it('skips server when no repo found', function () {
     }
     EOL);
 
-    $this->artisan('repo:get --repo-matches notfoundrepo --config '.$pathToConfig)
+    $this->artisan('repo:get --repo-matches notfoundrepo --config ' . $pathToConfig)
         ->expectsOutput('Collecting repository names for: some name')
         ->expectsOutput('0 repository found. Cloning/Fetching...')
         ->expectsOutput('Collecting repository names for: another server')
@@ -449,7 +449,7 @@ it('clones repos', function () {
     }
     EOL);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
     expect(count(FileManager::allDir($to)))
         ->toBe(1);
@@ -494,7 +494,7 @@ it('clones repos', function () {
     }
     EOL);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
 
     expect(count(FileManager::allDir($to)))
@@ -534,10 +534,10 @@ it('fetches repos', function () {
     }
     EOL);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
 
     expect(FileManager::allDir($to)[0])->toContain('full-screen-js-codes.git');
@@ -545,7 +545,7 @@ it('fetches repos', function () {
     expect(count(RepositoryManager::getClonedReposTo()))->toBe(1);
     expect(count(RepositoryManager::getFetchedRepos()))->toBe(1);
     expect(RepositoryManager::getClonedReposTo()[0])->toContain($to);
-    expect(RepositoryManager::getFetchedRepos()[0])->toContain($to.DIRECTORY_SEPARATOR.'full-screen-js-codes.git');
+    expect(RepositoryManager::getFetchedRepos()[0])->toContain($to . DIRECTORY_SEPARATOR . 'full-screen-js-codes.git');
 
     Storage::disk('local')
         ->deleteDirectory('tests/temp');
@@ -581,10 +581,10 @@ it('fetches repos', function () {
     }
     EOL);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
 
-    expect(Artisan::call('repo:get --config '.$pathToConfig))
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
         ->toBe(Command::SUCCESS);
 
     expect(FileManager::allDir($to)[0])->toContain('full-screen-js-codes.git');
@@ -594,6 +594,6 @@ it('fetches repos', function () {
     expect(count(RepositoryManager::getFetchedRepos()))->toBe(2);
     expect(RepositoryManager::getClonedReposTo()[0])->toContain($to);
     expect(RepositoryManager::getClonedReposTo()[1])->toContain($to);
-    expect(RepositoryManager::getFetchedRepos()[0])->toContain($to.DIRECTORY_SEPARATOR.'full-screen-js-codes.git');
-    expect(RepositoryManager::getFetchedRepos()[1])->toContain($to.DIRECTORY_SEPARATOR.'laravel-livewire.git');
+    expect(RepositoryManager::getFetchedRepos()[0])->toContain($to . DIRECTORY_SEPARATOR . 'full-screen-js-codes.git');
+    expect(RepositoryManager::getFetchedRepos()[1])->toContain($to . DIRECTORY_SEPARATOR . 'laravel-livewire.git');
 });
