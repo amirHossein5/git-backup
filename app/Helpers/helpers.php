@@ -28,10 +28,10 @@ function chunk_iterator(Iterator $it, int $n)
 function getArtisanCommand(string $command): string
 {
     if (config('app.env') === 'production') {
-        return './builds/backup ' . $command;
+        return './builds/backup '.$command;
     }
 
-    return 'php backup ' . $command;
+    return 'php backup '.$command;
 }
 
 function rmdir_recursive(string $dir): void

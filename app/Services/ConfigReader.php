@@ -96,14 +96,14 @@ class ConfigReader
 
             if ($vars->isNotEmpty()) {
                 $vars = $vars->mapWithKeys(
-                    fn ($val, $key) => [str_replace($varKey . '.', '', $key) => $val]
+                    fn ($val, $key) => [str_replace($varKey.'.', '', $key) => $val]
                 )->toArray();
 
                 $decodedUse = self::resolveVars(with: $vars, in: $decodedUse);
             }
 
             foreach ($decodedUse as $key => $value) {
-                $generatedKey = str($useKey)->replace('use' . str($useKey)->after('use'), '') . $key;
+                $generatedKey = str($useKey)->replace('use'.str($useKey)->after('use'), '').$key;
 
                 if (! isset($arrayDot[$generatedKey])) {
                     $arrayDot[$generatedKey] = $value;
