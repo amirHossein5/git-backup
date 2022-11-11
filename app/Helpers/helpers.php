@@ -7,6 +7,24 @@ function pathable(?string $path): ?string
         : str($path)->replace('/', DIRECTORY_SEPARATOR);
 }
 
+function chunk_iterator(Iterator $it, int $n)
+{
+    $chunk = [];
+
+    for($i = 0; $it->valid(); $i++){
+        $chunk[] = $it->current();
+        $it->next();
+        if(count($chunk) == $n){
+            yield $chunk;
+            $chunk = [];
+        }
+    }
+
+    if(count($chunk)){
+        yield $chunk;
+    }
+}
+
 function getArtisanCommand(string $command): string
 {
     if (config('app.env') === 'production') {
@@ -54,11 +72,11 @@ function readable_size($size): string
     if($size < 1024) {
         return "{$size} bytes";
     } elseif($size < 1048576) {
-        $size_kb = round($size/1024, 1);
+        $size_kb = round($size/1024, 2);
         return "{$size_kb} KB";
     } else {
-        $size_mb = round($size/1000000, 1);
-        $size_gb = round($size_mb/1024, 1);
+        $size_mb = round($size/1000000, 2);
+        $size_gb = round($size_mb/1024, 2);
 
         if ($size_gb >= 1) {
             return "{$size_gb} GB";
