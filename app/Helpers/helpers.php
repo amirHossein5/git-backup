@@ -63,6 +63,7 @@ function dirsize(string $dir): int
     foreach ($iterator as $i) {
         $bytes += $i->getSize();
     }
+
     return $bytes;
 }
 
@@ -71,11 +72,12 @@ function readable_size($size): string
     if ($size < 1024) {
         return "{$size} bytes";
     } elseif ($size < 1048576) {
-        $size_kb = round($size/1024, 2);
+        $size_kb = round($size / 1024, 2);
+
         return "{$size_kb} KB";
     } else {
-        $size_mb = round($size/1000000, 2);
-        $size_gb = round($size_mb/1024, 2);
+        $size_mb = round($size / 1000000, 2);
+        $size_gb = round($size_mb / 1024, 2);
 
         if ($size_gb >= 1) {
             return "{$size_gb} GB";
