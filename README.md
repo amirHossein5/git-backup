@@ -69,9 +69,11 @@ If directory that you're uploading already exists in the specfied disk, then som
 
 - deleting directory from disk
     - this just removes the uploaded directory from disk
+- fresh directory
+    - deletes uploaded folder, then uploads current directory
 - selecting new name
     - equilvant of `--to-dir`, uploads directory with another dir name
-- replacing directory
+- replace directory
     - replaces directory with previously uploaded one
     - files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
 - merge directory

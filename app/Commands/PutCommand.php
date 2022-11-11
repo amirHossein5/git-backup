@@ -28,9 +28,10 @@ class PutCommand extends Command
 
     // upload mods
     public const DELETE_FROM_DISK = 'delete dir from disk';
-    public const SELECT_NEW_NAME = 'select new name for distination';
+    public const FRESH_DIR = 'fresh directory';
+    public const SELECT_NEW_NAME = 'select new distination name';
     public const REPLACE_IT = 'replace it';
-    public const MERGE_IT = 'merge it with uploaded one';
+    public const MERGE_IT = 'merge it';
     public const UPLOAD_DIRECTLY = 'uploads to disk';
 
     /**
@@ -45,6 +46,7 @@ class PutCommand extends Command
         {--disk-tokens= : Path to json file that contains disk authorization items.}
         {--merge : When already exists, merge it.}
         {--replace : When already exists, replace it.}
+        {--fresh : When already exists, fresh directory.}
     ';
 
     /**
@@ -109,8 +111,12 @@ class PutCommand extends Command
             $mod = $this->getMod();
 
             if ($mod === self::DELETE_FROM_DISK) {
-                $this->task("Deleted {$dirPathWillBe}", fn () => Storage::disk($disk)->deleteDirectory($dirPathWillBe));
+                $this->deleteDir();
                 return Output::SUCCESS;
+            }
+            if ($mod === self::FRESH_DIR) {
+                $this->deleteDir();
+                $mod = self::UPLOAD_DIRECTLY;
             }
 
             if ($mod === self::SELECT_NEW_NAME) {
@@ -178,6 +184,11 @@ class PutCommand extends Command
         return Output::SUCCESS;
     }
 
+    private function deleteDir(): void
+    {
+        $this->task("Deleted {$this->dirPathWillBe}", fn () => Storage::disk($this->disk)->deleteDirectory($this->dirPathWillBe));
+    }
+
     private function getMod(): string
     {
         $mod = PutCommand::UPLOAD_DIRECTLY;
@@ -188,10 +199,13 @@ class PutCommand extends Command
         if ($this->option('replace') === true) {
             $mod = PutCommand::REPLACE_IT;
         }
+        if ($this->option('fresh') === true) {
+            $mod = PutCommand::FRESH_DIR;
+        }
         if ($mod === PutCommand::UPLOAD_DIRECTLY) {
             $mod = $this->choice(
                 "Directory <comment>{$this->dirPathWillBe}</comment> exists in disk <comment>{$this->disk}</comment>",
-                [self::DELETE_FROM_DISK, self::SELECT_NEW_NAME, self::REPLACE_IT, self::MERGE_IT]
+                [self::DELETE_FROM_DISK, self::FRESH_DIR, self::SELECT_NEW_NAME, self::REPLACE_IT, self::MERGE_IT]
             );
         }
 

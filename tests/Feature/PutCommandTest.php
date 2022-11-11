@@ -253,6 +253,65 @@ test('test when disk tokens are not valid', function () {
         ->assertExitCode(Command::FAILURE);
 });
 
+it('when dir already exists, freshes dir', function () {
+    $dirName = uniqid();
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName);
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/empty/folder');
+    Storage::disk('local')->makeDirectory('tests/temp/'.$dirName.'/some/not/folder');
+    $dir = Storage::disk('local')->path('tests/temp/'.$dirName);
+    $toDir = 'somenotprevoiuslycreatedfolder';
+
+    Storage::disk('local')->deleteDirectory($toDir);
+
+    Storage::disk('local')
+        ->put("tests/temp/{$dirName}/some/not/file.txt", 'some/not/file.txt');
+    Storage::disk('local')
+        ->put("tests/temp/{$dirName}/some/not/folder/file.txt", 'some/not/folder/file.txt');
+    Storage::disk('local')
+        ->put("tests/temp/{$dirName}/file.txt", 'rest');
+
+    Artisan::call("put --disk local --dir={$dir} --to-dir={$toDir}");
+
+    Storage::disk('local')
+        ->put("tests/temp/{$dirName}/file.txt", 'test');
+
+    Artisan::call("put --disk local --dir={$dir} --to-dir={$toDir} --fresh");
+
+    $dirName = $toDir;
+
+    expect(count(FileManager::allDir($dirName)))->toBe(1);
+    expect(count(FileManager::allFiles($dirName)))->toBe(1);
+    expect(FileManager::allDir($dirName)[0])->toBe(pathable("$dirName/some"));
+    expect(FileManager::allFiles($dirName)[0])->toBe(pathable("$dirName/file.txt"));
+
+    expect(count(FileManager::allDir("$dirName/some")))->toBe(2);
+    expect(count(FileManager::allFiles("$dirName/some")))->toBe(0);
+    expect(FileManager::allDir("$dirName/some")[0])->toBe(pathable("$dirName/some/empty"));
+    expect(FileManager::allDir("$dirName/some")[1])->toBe(pathable("$dirName/some/not"));
+
+    expect(count(FileManager::allDir("$dirName/some/empty")))->toBe(1);
+    expect(count(FileManager::allFiles("$dirName/some/empty")))->toBe(0);
+    expect(FileManager::allDir("$dirName/some/empty")[0])->toBe(pathable("$dirName/some/empty/folder"));
+
+    expect(count(FileManager::allDir("$dirName/some/empty/folder")))->toBe(0);
+    expect(count(FileManager::allFiles("$dirName/some/empty/folder")))->toBe(0);
+
+    expect(count(FileManager::allDir("$dirName/some/not")))->toBe(1);
+    expect(count(FileManager::allFiles("$dirName/some/not")))->toBe(1);
+    expect(FileManager::allDir("$dirName/some/not")[0])->toBe(pathable("$dirName/some/not/folder"));
+    expect(FileManager::allFiles("$dirName/some/not")[0])->toBe(pathable("$dirName/some/not/file.txt"));
+
+    expect(count(FileManager::allDir("$dirName/some/not/folder")))->toBe(0);
+    expect(count(FileManager::allFiles("$dirName/some/not/folder")))->toBe(1);
+    expect(FileManager::allFiles("$dirName/some/not/folder")[0])->toBe(pathable("$dirName/some/not/folder/file.txt"));
+
+    expect(file_get_contents(base_path($dirName.'/file.txt')))->toBe('test');
+    expect(file_get_contents(base_path($dirName.'/some/not/folder/file.txt')))->toBe(pathable('some/not/folder/file.txt'));
+    expect(file_get_contents(base_path($dirName.'/some/not/file.txt')))->toBe(pathable('some/not/file.txt'));
+
+    expect(Storage::disk('local')->deleteDirectory($dirName))->toBeTrue();
+});
+
 it('when dir already exists, deletes dir', function () {
     $dir = base_path('stubs');
 
