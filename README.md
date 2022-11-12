@@ -111,6 +111,14 @@ e.g, json file for dropbox:
 ./builds/backup put ... --disk-tokens=path/to/disk-auth.json
 ```
 
+### Logging
+
+To uploaded files, and created directories be logged somewhere you can pass log file path via:
+
+```sh
+./builds/backup put ... --log-to=log.txt
+```
+
 ## Show disk command
 
 For seeing available disks run:
