@@ -13,7 +13,7 @@ beforeEach(function () {
                     'using' => 'git c',
                 ],
                 'repo-names' => [
-                    'from-api' => null,
+                    'fromApi' => null,
                     'pattern' => null,
                     'names' => 'a repo name',
                     'token' => null,

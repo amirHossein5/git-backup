@@ -118,7 +118,7 @@ it('shows error if required config key missing', function () {
     EOL);
 
     $this->artisan('repo:get --config ' . $pathToConfig)
-        ->expectsOutput('required config key repo-names.from-api missing.')
+        ->expectsOutput('required config key repo-names.fromApi missing.')
         ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -131,7 +131,7 @@ it('shows error if required config key missing', function () {
                     using: git@github.com...
                 },
                 repo-names: {
-                    from-api: someserver.com
+                    fromApi: someserver.com
                 }
             }
         ]
@@ -152,7 +152,7 @@ it('shows error if required config key missing', function () {
                     using: git@github.com...
                 },
                 repo-names: {
-                    from-api: smoenotfoundserver.notfound
+                    fromApi: smoenotfoundserver.notfound
                     pattern: *.name
                 }
             }
@@ -301,7 +301,7 @@ it('fails on wrong server token', function () {
                     "using": "git@github.com..."
                 },
                 "repo-names": {
-                    "from-api": "https://api.github.com/search/repositories?q=user:-username-",
+                    "fromApi": "https://api.github.com/search/repositories?q=user:-username-",
                     "pattern": "items.*.name",
                     "token": "sometoken"
                 }
@@ -362,7 +362,7 @@ it('gets filtered repo', function () {
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repo-names": {
-                    "from-api": "https://api.github.com/search/repositories?q=user:amirhossein5",
+                    "fromApi": "https://api.github.com/search/repositories?q=user:amirhossein5",
                     "pattern": "items.*.name"
                 }
             }
