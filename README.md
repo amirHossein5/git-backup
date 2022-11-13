@@ -170,6 +170,7 @@ If you are using github easily [use](#use-keyword):
 +           "username": "your-github-username"
 +       }
 +   },
++   "token": "if has token"
 }
 ```
 
