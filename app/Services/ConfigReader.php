@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Exceptions\RequiredKeyMissing;
+use App\Services\RepositoryManager;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 
 class ConfigReader
 {
@@ -18,7 +20,7 @@ class ConfigReader
      */
     private static array $requiredIfMissingInServers = [
         'repo-names.names' => [
-            'repo-names.from-api',
+            'repo-names.fromApi.urls',
             'repo-names.pattern',
         ],
     ];
@@ -32,6 +34,7 @@ class ConfigReader
         $decodedJson = JsonDecoder::decode($jsonContent);
 
         $decodedJson = self::resolveUse($decodedJson);
+        $decodedJson = self::getTranslatedConfig($decodedJson);
 
         collect(self::$requiredKeys)->each(function ($forceKey) use ($decodedJson) {
             self::throwExceptionIfKeyDoesNotExist($decodedJson, $forceKey, count($decodedJson['servers']));
@@ -46,12 +49,12 @@ class ConfigReader
                 }
 
                 foreach ($requiredKeys as $requiredKey) {
-                    self::throwExceptionIfKeyDoesNotExist($server, $requiredKey, 1);
+                    self::throwExceptionIfKeyDoesNotExist($server, $requiredKey);
                 }
             }
         });
 
-        return new ConfigReader(self::getTranslatedConfig($decodedJson));
+        return new ConfigReader($decodedJson);
     }
 
     public function servers(): array
@@ -131,13 +134,19 @@ class ConfigReader
         return $in;
     }
 
-    private static function throwExceptionIfKeyDoesNotExist(array $array, string $requiredKey, int $expectedCount): void
+    private static function throwExceptionIfKeyDoesNotExist(array $array, string $requiredKey, ?int $expectedCount = null): void
     {
         $key = collect(data_get($array, $requiredKey))
                 ->filter();
 
-        if ($key->count() !== $expectedCount) {
-            throw new RequiredKeyMissing($requiredKey);
+        if (! $expectedCount) {
+            if ($key->count() === 0) {
+                throw new RequiredKeyMissing($requiredKey);
+            }
+        } else {
+            if ($key->count() !== $expectedCount) {
+                throw new RequiredKeyMissing($requiredKey);
+            }
         }
     }
 
@@ -159,7 +168,12 @@ class ConfigReader
                     'using' => $server['clone']['using'],
                 ],
                 'repo-names' => [
-                    'from-api' => isset($server['repo-names']['from-api']) ? $server['repo-names']['from-api'] : null,
+                    'fromApi' => isset($server['repo-names']['fromApi']) ? [
+                        'urls' => self::getApiUrls(
+                            $server['repo-names']['fromApi'],
+                            isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null
+                        )
+                    ] : null,
                     'pattern' => isset($server['repo-names']['pattern']) ? $server['repo-names']['pattern'] : null,
                     'names' => isset($server['repo-names']['names']) ? $server['repo-names']['names'] : null,
                     'token' => isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null,
@@ -168,5 +182,52 @@ class ConfigReader
         });
 
         return $config;
+    }
+
+    private static function getApiUrls(string|array $apiUrls, ?string $token): array
+    {
+        if (is_string($apiUrls)) {
+            return [$apiUrls];
+        }
+
+        if (isset($apiUrls['withPagination']) && $apiUrls['withPagination'] === true) {
+            return self::resolvePaginationUrls($apiUrls, $token);
+        }
+
+        if (isset($apiUrls['url'])) {
+            return [$apiUrls['url']];
+        }
+
+        if (isset($apiUrls['urls'])) {
+            return $apiUrls['urls'];
+        }
+
+        return [];
+    }
+
+    private static function resolvePaginationUrls(array $apiUrls, ?string $token): array
+    {
+        $urls = [];
+        $pageQueryString = isset($apiUrls['pageQueryString']) ? $apiUrls['pageQueryString'] : 'page';
+        $perPage = (int) $apiUrls['perPage'];
+
+        if (filter_var($apiUrls['total'], FILTER_VALIDATE_URL)) {
+            $total = self::getTotalCountFromApi($apiUrls['total'], $token, $apiUrls['totalKey']);
+        } else {
+            $total = (int) $apiUrls['total'];
+        }
+
+        $countPages = ceil($total/$perPage);
+
+        for ($i=1; $i <= $countPages; $i++) {
+            $urls[] = $apiUrls['url']."&{$pageQueryString}={$i}";
+        }
+
+        return $urls;
+    }
+
+    private static function getTotalCountFromApi(string $url, ?string $token, string $totalKey): int
+    {
+        return RepositoryManager::getPatternFromApi($url, $token, $totalKey)->first();
     }
 }
