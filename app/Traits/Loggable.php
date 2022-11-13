@@ -9,10 +9,16 @@ trait Loggable
     private function logFile(string $filePath, string $fileSize): void
     {
         $fileSize = "($fileSize)";
-        $fittedFilePath = Terminal::fitWidth($filePath, usedWidth: 2 + strlen($fileSize) + 1);
+        $fittedFilePath = Terminal::fitWidth($filePath, $usedWidth = 2 + strlen($fileSize) + 1);
         $logMessage = Terminal::mkTwoColMessage("-<comment> $fittedFilePath</comment>", $fileSize);
 
-        $this->log($logMessage);
+        $isOverlapped = str($fittedFilePath)->endsWith('..');
+
+        if ($isOverlapped) {
+            $this->log($logMessage, "- $filePath  $fileSize");
+        } else {
+            $this->log($logMessage, "");
+        }
     }
 
     private function logDir(string $dirPath): void
@@ -20,10 +26,10 @@ trait Loggable
         $fittedDirPath = Terminal::fitWidth($dirPath, usedWidth: 2);
         $logMessage = "d<comment> $fittedDirPath</comment>";
 
-        $this->log($logMessage);
+        $this->log($logMessage, "d $dirPath");
     }
 
-    private function log(string $message): void
+    private function log(string $message, ?string $fileLogMessage = null): void
     {
         $this->progressBar->clear();
         $this->line($message);
@@ -32,6 +38,9 @@ trait Loggable
         if ($this->logTo) {
             if (! file_exists($this->logTo)) {
                 touch($this->logTo);
+            }
+            if ($fileLogMessage) {
+                $message = $fileLogMessage;
             }
 
             file_put_contents(
