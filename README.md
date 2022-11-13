@@ -188,7 +188,7 @@ For getting repository names from api, you can define a api url, with a pattern 
 ```diff
 "repo-names": {
 -   "names": ["reponame", "anothername"]
-+   "from-api": "https://api.github.com/search/repositories?q=user:yourusername",
++   "fromApi": "https://api.github.com/search/repositories?q=user:yourusername",
 +   "pattern": "items.*.name",
 +   "token": "if has token"
 }
@@ -197,16 +197,51 @@ For getting repository names from api, you can define a api url, with a pattern 
 `"pattern": "items.*.name"` based on api response means:
 
 ```php
-[
-    // ...
-    "items" => [
-        0 => [
-            "name" => "repo name"
-        ]
-        1 => // ...,
-        2 => // ...,
+"items" => [
+    0 => [
+        "name" => "repo name" //...
     ]
-]
+    1 => // ...
+```
+
+### Using paginated api url
+
+Sometimes the api url has pagination, for that you can expand `fromApi` like this:
+
+```hjson
+"repo-names": {
+    fromApi:  {
+        url: "https://someurl.com/?per_page=50",
+        withPagination: true,
+        total: 100
+        perPage: 50
+    }
+}
+```
+
+`total` also can be get from api too:
+
+```diff
+fromApi:  {
+    url: "https://someurl.com/?per_page=50",
+    withPagination: true,
+-   total: 100
++   total: "https://api.github.com/search/repositories?q=user:amirHossein5",
++   totalKey: "total_count"
+    perPage: 50
+}
+```
+
+`totalKey` stands for key of response json which has total.
+
+By default the query string for pages(`?page=2`) is `page` for customizing that pass `pageQueryString`:
+
+```diff
+fromApi:  {
+    url: "https://someurl.com/?per_page=50",
+    withPagination: true,
++   pageQueryString: "pg",
+//...
 ```
 
 ## `use` keyword
