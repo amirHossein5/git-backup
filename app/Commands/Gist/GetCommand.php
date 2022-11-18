@@ -206,6 +206,7 @@ class GetCommand extends Command
         }
 
         if (! $update) {
+            $this->line("Checked file $filename");
             return;
         } else {
             $this->info("Updating file <comment>$filename</comment>");
