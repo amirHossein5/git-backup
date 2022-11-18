@@ -5,9 +5,61 @@ namespace App\Traits;
 use App\Services\FileManager;
 use App\Services\Terminal;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Console\Command\Command as Output;
 
 trait Uploadable
 {
+    private function manageFileUploads(string $filePath, ?string $toDir): int
+    {
+        $this->newLine();
+        $this->info('Checking disk...');
+
+        $filePath = pathable(realpath($filePath));
+        $fileName = basename($filePath);
+        $toDir = str($toDir)->rtrim(DIRECTORY_SEPARATOR);
+        $diskFilePath = $toDir ? pathable("$toDir/$fileName") : $fileName;
+        $diskFilePath = str($diskFilePath)->rtrim(DIRECTORY_SEPARATOR);
+
+        try {
+            $exists = Storage::disk($this->disk)->exists($diskFilePath);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+            return Output::FAILURE;
+        }
+
+        if (! $exists) {
+            $this->info("Uploading to disk: <comment>{$this->disk}</comment>, path: <comment>{$diskFilePath}</comment>");
+
+            try {
+                $this->uploadFile($filePath, diskFilePath: $diskFilePath);
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+                return Output::FAILURE;
+            }
+
+            $this->newLine();
+            $totalSize = readable_size($this->totalUploadedBytes);
+            $this->info("Uploaded file size: <comment>{$totalSize}</comment>");
+
+            return Output::SUCCESS;
+        }
+
+        $deleteConfirm = $this->confirm("File exists in disk: {$this->disk} path: {$diskFilePath}. Do you want to delete and reupload file?");
+
+        if (! $deleteConfirm) {
+            return Output::FAILURE;
+        }
+
+        $this->task("Deleting <comment>{$diskFilePath}</comment>", fn () =>
+            $this->failWhen(
+                ! Storage::disk($this->disk)->delete($diskFilePath),
+                "Counldn't delete file from path: {$filePath}. Check your connection, or set disk authorization tokens."
+            )
+        );
+
+        return $this->manageFileUploads($filePath, $toDir);
+    }
+
     private function manageUpload(string $mod, string $dirPath): void
     {
         if ($mod === self::UPLOAD_DIRECTLY) {
@@ -235,14 +287,18 @@ trait Uploadable
         );
     }
 
-    private function uploadFile(string $file, string $baseDirPath): void
+    private function uploadFile(string $localFilePath, ?string $baseDirPath = null, ?string $diskFilePath = null): void
     {
-        $filePath = str($file)->replace(
-            str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
-            $this->dirPathWillBe
-        );
+        if ($diskFilePath) {
+            $filePath = $diskFilePath;
+        } else {
+            $filePath = str($localFilePath)->replace(
+                str($baseDirPath)->rtrim(DIRECTORY_SEPARATOR),
+                $this->dirPathWillBe
+            );
+        }
 
-        $fileContent = file_get_contents($file);
+        $fileContent = file_get_contents($localFilePath);
 
         if ($fileContent === '') {
             $fileContent = ' ';
@@ -253,7 +309,7 @@ trait Uploadable
             "Counldn't create file in disk path {$filePath}. Check your connection, or set disk authorization tokens."
         );
 
-        $this->totalUploadedBytes += filesize($file);
+        $this->totalUploadedBytes += filesize($localFilePath);
     }
 
     private function deleteDir(): void
