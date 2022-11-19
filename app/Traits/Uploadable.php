@@ -55,7 +55,9 @@ trait Uploadable
             return Output::FAILURE;
         }
 
-        $this->task("Deleting <comment>{$diskFilePath}</comment>", fn () =>
+        $this->task(
+            "Deleting <comment>{$diskFilePath}</comment>",
+            fn () =>
             $this->failWhen(
                 ! Storage::disk($this->disk)->delete($diskFilePath),
                 "Counldn't delete file from path: {$filePath} Check your connection, or set disk authorization tokens."

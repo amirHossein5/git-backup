@@ -313,7 +313,7 @@ it('fails on wrong server token', function () {
     $this->artisan('repo:get --config ' . $pathToConfig)
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Collecting repository names for: some name')
-        ->expectsOutput('Request failed with status code: 401. Message: Bad credentials')
+        ->expectsOutputToContain('HTTP request returned status code 401:')
         ->assertExitCode(Command::FAILURE);
 });
 
