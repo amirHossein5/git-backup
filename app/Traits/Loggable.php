@@ -45,7 +45,7 @@ trait Loggable
 
             file_put_contents(
                 $this->logTo,
-                trim(file_get_contents($this->logTo).PHP_EOL.'['.now().'] '.Terminal::clearTags($message))
+                trim(file_get_contents($this->logTo) . PHP_EOL . '[' . now() . '] ' . Terminal::clearTags($message))
             );
         }
     }

@@ -44,12 +44,12 @@ class GetCommand extends Command
         }
 
         if (! is_dir($this->option('to-dir'))) {
-            $this->error("Directory not found: ".$this->option('to-dir'));
+            $this->error("Directory not found: " . $this->option('to-dir'));
             return Output::FAILURE;
         }
 
         if (! is_file($this->option('config'))) {
-            $this->error("Config file not found: ".$this->option('config'));
+            $this->error("Config file not found: " . $this->option('config'));
             return Output::FAILURE;
         }
 
@@ -81,7 +81,7 @@ class GetCommand extends Command
         }
 
         $this->newLine();
-        $this->info('Total proceeded gists: '.$proceededGists);
+        $this->info('Total proceeded gists: ' . $proceededGists);
 
         return Output::SUCCESS;
     }
@@ -125,7 +125,7 @@ class GetCommand extends Command
             mkdir($gistDirPath);
         }
 
-        $this->info("Processing <comment>".$gistIndicator.'</comment>');
+        $this->info("Processing <comment>" . $gistIndicator . '</comment>');
 
         foreach ($gistJson['files'] as $file) {
             $filePath = pathable("{$gistDirPath}/{$file['filename']}");
@@ -150,7 +150,7 @@ class GetCommand extends Command
                 $http->withToken($this->token);
             }
 
-            $responseComments = $http->get($gistJson['comments_url']."?page={$i}")->json();
+            $responseComments = $http->get($gistJson['comments_url'] . "?page={$i}")->json();
 
             if (blank($responseComments)) {
                 break;
@@ -165,10 +165,10 @@ class GetCommand extends Command
                 $title = "created_at: [{$createdAt}] updated_at: [{$updatedAt}] author: {$author}";
                 $titleSeparator = $this->createTitleSeparator(len: strlen($title));
 
-                $commentsTxtContent .= $titleSeparator.PHP_EOL;
+                $commentsTxtContent .= $titleSeparator . PHP_EOL;
                 $commentsTxtContent .= $title . PHP_EOL;
-                $commentsTxtContent .= $titleSeparator.PHP_EOL;
-                $commentsTxtContent .= $body.PHP_EOL;
+                $commentsTxtContent .= $titleSeparator . PHP_EOL;
+                $commentsTxtContent .= $body . PHP_EOL;
             }
         }
 

@@ -89,7 +89,7 @@ class PutCommand extends Command
 
         if ($this->logTo) {
             if (! is_dir(dirname($this->logTo))) {
-                $this->error('Log file directory not found: '.dirname($this->logTo));
+                $this->error('Log file directory not found: ' . dirname($this->logTo));
                 return Output::FAILURE;
             }
         }
