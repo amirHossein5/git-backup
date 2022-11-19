@@ -20,6 +20,11 @@ trait Uploadable
         $diskFilePath = $toDir ? pathable("$toDir/$fileName") : $fileName;
         $diskFilePath = str($diskFilePath)->rtrim(DIRECTORY_SEPARATOR);
 
+        if (! is_file($filePath)) {
+            $this->error("File not found in path: {$filePath}");
+            return Output::FAILURE;
+        }
+
         try {
             $exists = Storage::disk($this->disk)->exists($diskFilePath);
         } catch (\Exception $e) {
@@ -44,7 +49,7 @@ trait Uploadable
             return Output::SUCCESS;
         }
 
-        $deleteConfirm = $this->confirm("File exists in disk: {$this->disk} path: {$diskFilePath}. Do you want to delete and reupload file?");
+        $deleteConfirm = $this->confirm("File exists in disk: {$this->disk} path: {$diskFilePath} Do you want to delete and reupload file?");
 
         if (! $deleteConfirm) {
             return Output::FAILURE;
@@ -53,7 +58,7 @@ trait Uploadable
         $this->task("Deleting <comment>{$diskFilePath}</comment>", fn () =>
             $this->failWhen(
                 ! Storage::disk($this->disk)->delete($diskFilePath),
-                "Counldn't delete file from path: {$filePath}. Check your connection, or set disk authorization tokens."
+                "Counldn't delete file from path: {$filePath} Check your connection, or set disk authorization tokens."
             )
         );
 

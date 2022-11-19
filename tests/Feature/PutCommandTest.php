@@ -476,3 +476,168 @@ it('when dir already exists, uploads remained things', function () {
     expect(Storage::disk('local')->deleteDirectory('upload-remains'))->toBeTrue();
     expect(glob('*.tmp'))->toHaveLength(0);
 });
+
+it('shows error when upload file does not exists or is directory not a file', function () {
+    $this->artisan("put --file some/file --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('File not found in path: '.realpath('some/file'))
+        ->assertExitCode(Command::FAILURE);
+    $this->artisan("put --file app --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('File not found in path: '.realpath('app/'))
+        ->assertExitCode(Command::FAILURE);
+    $this->artisan("put --file somefile.txt --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('File not found in path: '.realpath('somefile.txt'))
+        ->assertExitCode(Command::FAILURE);
+});
+
+
+it('will upload file', function () {
+    $dirName = uniqid();
+    $fileContent = uniqid().uniqid();
+    $filePath = 'tests/temp/'.$dirName.DIRECTORY_SEPARATOR.'file.txt';
+    $fullFilePath = base_path('tests/temp/'.$dirName).DIRECTORY_SEPARATOR.'file.txt';
+    $diskFilePath = base_path().DIRECTORY_SEPARATOR.'file.txt';
+
+    Storage::disk('local')->delete('file.txt');
+    Storage::disk('local')->put($filePath, $fileContent);
+
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: /file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded file size: '.$readable_size)
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(
+        file_get_contents($diskFilePath) === $fileContent &&
+        Storage::disk('local')->deleteDirectory($dirName) &&
+        Storage::disk('local')->delete('file.txt')
+    )->toBeTrue();
+});
+
+it('will upload file to specified path', function () {
+    $dirName = uniqid();
+    $fileContent = uniqid().uniqid();
+    $filePath = 'tests/temp/'.$dirName.DIRECTORY_SEPARATOR.'file.txt';
+    $fullFilePath = base_path('tests/temp/'.$dirName).DIRECTORY_SEPARATOR.'file.txt';
+    $diskFilePath = base_path('tests/temp1/to-dir').DIRECTORY_SEPARATOR.'file.txt';
+
+    Storage::disk('local')->delete('tests/temp1/to-dir/file.txt');
+    Storage::disk('local')->put($filePath, $fileContent);
+
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local --to-dir tests/temp1/to-dir")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: tests/temp1/to-dir/file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded file size: '.$readable_size)
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(FileManager::allDir('tests/temp1/to-dir'))->toHaveLength(0);
+    expect(FileManager::allFiles('tests/temp1/to-dir'))->toHaveLength(1);
+
+    expect(
+        file_get_contents($diskFilePath) === $fileContent &&
+        Storage::disk('local')->deleteDirectory($dirName) &&
+        Storage::disk('local')->delete('tests/temp1/to-dir/file.txt')
+    )->toBeTrue();
+});
+
+it('wont reupload file when confirmation is rejected', function () {
+    $dirName = uniqid();
+    $fileContent = uniqid().uniqid();
+    $filePath = 'tests/temp/'.$dirName.DIRECTORY_SEPARATOR.'file.txt';
+    $fullFilePath = base_path('tests/temp/'.$dirName).DIRECTORY_SEPARATOR.'file.txt';
+    $diskFilePath = base_path().DIRECTORY_SEPARATOR.'file.txt';
+
+    Storage::disk('local')->put($filePath, ' ');
+    Storage::disk('local')->delete($filePath);
+    Storage::disk('local')->delete('file.txt');
+
+    touch($fullFilePath);
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: /file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded file size: '.$readable_size)
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(
+        file_get_contents($diskFilePath) === ' '
+    )->toBeTrue();
+
+    Storage::disk('local')->put($filePath, $fileContent);
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsConfirmation('File exists in disk: local path: /file.txt Do you want to delete and reupload file?', 'no')
+        ->assertExitCode(Command::FAILURE);
+
+    expect(
+        file_get_contents($diskFilePath) === ' ' &&
+        Storage::disk('local')->deleteDirectory($dirName) &&
+        Storage::disk('local')->delete('file.txt')
+    )->toBeTrue();
+});
+
+it('will reupload file if already exists', function () {
+    $dirName = uniqid();
+    $fileContent = uniqid().uniqid();
+    $filePath = 'tests/temp/'.$dirName.DIRECTORY_SEPARATOR.'file.txt';
+    $fullFilePath = base_path('tests/temp/'.$dirName).DIRECTORY_SEPARATOR.'file.txt';
+    $diskFilePath = base_path().DIRECTORY_SEPARATOR.'file.txt';
+
+    Storage::disk('local')->put($filePath, ' ');
+    Storage::disk('local')->delete($filePath);
+    Storage::disk('local')->delete('file.txt');
+
+    touch($fullFilePath);
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: /file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded file size: '.$readable_size)
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(
+        file_get_contents($diskFilePath) === ' '
+    )->toBeTrue();
+
+    Storage::disk('local')->put($filePath, $fileContent);
+    $readable_size = readable_size(filesize($fullFilePath));
+
+    $this->artisan("put --file {$fullFilePath} --disk local")
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsConfirmation('File exists in disk: local path: /file.txt Do you want to delete and reupload file?', 'yes')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: /file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded file size: '.$readable_size)
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(
+        file_get_contents($diskFilePath) === $fileContent &&
+        Storage::disk('local')->deleteDirectory($dirName) &&
+        Storage::disk('local')->delete('file.txt')
+    )->toBeTrue();
+});
