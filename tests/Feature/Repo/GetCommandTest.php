@@ -118,7 +118,7 @@ it('shows error if required config key missing', function () {
     EOL);
 
     $this->artisan('repo:get --config ' . $pathToConfig)
-        ->expectsOutput('required config key repo-names.fromApi missing.')
+        ->expectsOutput('required config key repoNames.fromApi.urls missing.')
         ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -130,7 +130,7 @@ it('shows error if required config key missing', function () {
                     to: /some/path
                     using: git@github.com...
                 },
-                repo-names: {
+                repoNames: {
                     fromApi: someserver.com
                 }
             }
@@ -139,7 +139,7 @@ it('shows error if required config key missing', function () {
     EOL);
 
     $this->artisan('repo:get --config ' . $pathToConfig)
-        ->expectsOutput('required config key repo-names.pattern missing.')
+        ->expectsOutput('required config key repoNames.pattern missing.')
         ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -151,7 +151,7 @@ it('shows error if required config key missing', function () {
                     to: /some/path
                     using: git@github.com...
                 },
-                repo-names: {
+                repoNames: {
                     fromApi: smoenotfoundserver.notfound
                     pattern: *.name
                 }
@@ -175,7 +175,7 @@ it('shows error if required config key missing', function () {
                     to: /some/path
                     using: git@github.com...
                 },
-                repo-names: {
+                repoNames: {
                     names: repo-name
                 }
             }
@@ -205,7 +205,7 @@ it('shows error if required config key missing', function () {
                     to: /some/path
                     using: git@github.com...
                 },
-                repo-names: {
+                repoNames: {
                     names: [
                         "first", 'second'
                     ]
@@ -241,7 +241,7 @@ it('skips server when clone.to directory not found', function () {
                     to: /some/path
                     using: git@github.com...
                 },
-                repo-names: {
+                repoNames: {
                     names: repo-name
                 }
             }
@@ -275,7 +275,7 @@ it('shows error when no server found', function () {
                     "to": "/some/path",
                     "using": "git@github.com..."
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "repo-name"
                 }
             }
@@ -300,7 +300,7 @@ it('fails on wrong server token', function () {
                     "to": "/some/path",
                     "using": "git@github.com..."
                 },
-                "repo-names": {
+                "repoNames": {
                     "fromApi": "https://api.github.com/search/repositories?q=user:-username-",
                     "pattern": "items.*.name",
                     "token": "sometoken"
@@ -330,7 +330,7 @@ it('filters repos', function () {
                     "to": "{$to}",
                     "using": "git@github.com..."
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "repo-name"
                 }
             }
@@ -361,7 +361,7 @@ it('gets filtered repo', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "fromApi": "https://api.github.com/search/repositories?q=user:amirhossein5",
                     "pattern": "items.*.name"
                 }
@@ -393,7 +393,7 @@ it('skips server when no repo found', function () {
                     "to": "{$to}",
                     "using": "git@github.com..."
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "repo-name"
                 }
             },
@@ -403,7 +403,7 @@ it('skips server when no repo found', function () {
                     "to": "{$to}",
                     "using": "git@github.com..."
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "repo-name"
                 }
             }
@@ -439,7 +439,7 @@ it('clones repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": [
                         "full-screen-js-codes.git"
                     ]
@@ -476,7 +476,7 @@ it('clones repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com:/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "full-screen-js-codes.git"
                 }
             },
@@ -486,7 +486,7 @@ it('clones repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "laravel-livewire.git"
                 }
             }
@@ -524,7 +524,7 @@ it('fetches repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": [
                         "full-screen-js-codes.git"
                     ]
@@ -563,7 +563,7 @@ it('fetches repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "full-screen-js-codes.git"
                 }
             },
@@ -573,7 +573,7 @@ it('fetches repos', function () {
                     "to": "{$to}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
-                "repo-names": {
+                "repoNames": {
                     "names": "laravel-livewire.git"
                 }
             }

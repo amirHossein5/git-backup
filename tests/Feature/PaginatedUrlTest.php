@@ -3,51 +3,51 @@
 use App\Services\ConfigReader;
 use Illuminate\Support\Facades\Http;
 
-test('generates url from repo-names.fromApi key', function () {
+test('generates url from repoNames.fromApi key', function () {
     $serversJson = $this->getServersJson([
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi' => 'someurl.com',
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi' => 'someurl.com',
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(1);
     expect($urls[0])->toBe('someurl.com');
 });
 
-test('generates url from repo-names.url key', function () {
+test('generates url from repoNames.url key', function () {
     $serversJson = $this->getServersJson([
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com',
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com',
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(1);
     expect($urls[0])->toBe('someurl.com');
 });
 
-test('generates url from repo-names.urls key', function () {
+test('generates url from repoNames.urls key', function () {
     $serversJson = $this->getServersJson([
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.urls.0' => 'someurl.com',
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.urls.0' => 'someurl.com',
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(1);
@@ -59,15 +59,15 @@ test('generates paginated urls', function () {
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com',
-        'repo-names.fromApi.withPagination' => true,
-        'repo-names.fromApi.total' => 10,
-        'repo-names.fromApi.perPage' => 3,
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com',
+        'repoNames.fromApi.withPagination' => true,
+        'repoNames.fromApi.total' => 10,
+        'repoNames.fromApi.perPage' => 3,
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(4);
@@ -80,15 +80,15 @@ test('generates paginated urls', function () {
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com?per_page=2&another',
-        'repo-names.fromApi.withPagination' => true,
-        'repo-names.fromApi.total' => 10,
-        'repo-names.fromApi.perPage' => 3,
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com?per_page=2&another',
+        'repoNames.fromApi.withPagination' => true,
+        'repoNames.fromApi.total' => 10,
+        'repoNames.fromApi.perPage' => 3,
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(4);
@@ -103,16 +103,16 @@ test('query string is changeable', function () {
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com',
-        'repo-names.fromApi.withPagination' => true,
-        'repo-names.fromApi.total' => 10,
-        'repo-names.fromApi.perPage' => 3,
-        'repo-names.fromApi.pageQueryString' => 'key',
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com',
+        'repoNames.fromApi.withPagination' => true,
+        'repoNames.fromApi.total' => 10,
+        'repoNames.fromApi.perPage' => 3,
+        'repoNames.fromApi.pageQueryString' => 'key',
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(4);
@@ -125,16 +125,16 @@ test('query string is changeable', function () {
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com?per_page=2&another',
-        'repo-names.fromApi.withPagination' => true,
-        'repo-names.fromApi.total' => 10,
-        'repo-names.fromApi.perPage' => 3,
-        'repo-names.fromApi.pageQueryString' => 'key',
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com?per_page=2&another',
+        'repoNames.fromApi.withPagination' => true,
+        'repoNames.fromApi.total' => 10,
+        'repoNames.fromApi.perPage' => 3,
+        'repoNames.fromApi.pageQueryString' => 'key',
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(4);
@@ -156,16 +156,16 @@ test('getting total items from api', function () {
         'name' => 'some name for server',
         'clone.to' => 'somewhere',
         'clone.using' => 'git clone',
-        'repo-names.fromApi.url' => 'someurl.com',
-        'repo-names.fromApi.withPagination' => true,
-        'repo-names.fromApi.total' => "https://api.github.com/search/repositories?q=user:someusername",
-        'repo-names.fromApi.totalKey' => "total_count",
-        'repo-names.fromApi.perPage' => 3,
-        'repo-names.pattern' => 'items.*.name'
+        'repoNames.fromApi.url' => 'someurl.com',
+        'repoNames.fromApi.withPagination' => true,
+        'repoNames.fromApi.total' => "https://api.github.com/search/repositories?q=user:someusername",
+        'repoNames.fromApi.totalKey' => "total_count",
+        'repoNames.fromApi.perPage' => 3,
+        'repoNames.pattern' => 'items.*.name'
     ]);
 
     $config = ConfigReader::read($serversJson);
-    $urls = $config->servers()[0]['repo-names']['fromApi']['urls'];
+    $urls = $config->servers()[0]['repoNames']['fromApi']['urls'];
 
     expect($config)->toHaveLength(1);
     expect($urls)->toHaveLength(4);

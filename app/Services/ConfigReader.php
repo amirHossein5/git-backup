@@ -19,9 +19,9 @@ class ConfigReader
      * If key is missing value(s) are required, in servers scope(key).
      */
     private static array $requiredIfMissingInServers = [
-        'repo-names.names' => [
-            'repo-names.fromApi.urls',
-            'repo-names.pattern',
+        'repoNames.names' => [
+            'repoNames.fromApi.urls',
+            'repoNames.pattern',
         ],
     ];
 
@@ -32,13 +32,13 @@ class ConfigReader
     public static function read(string $jsonContent): ConfigReader
     {
         $decodedJson = JsonDecoder::decode($jsonContent);
-
         $decodedJson = self::resolveUse($decodedJson);
-        $decodedJson = self::getTranslatedConfig($decodedJson);
 
         collect(self::$requiredKeys)->each(function ($forceKey) use ($decodedJson) {
             self::throwExceptionIfKeyDoesNotExist($decodedJson, $forceKey, count($decodedJson['servers']));
         });
+
+        $decodedJson = self::getTranslatedConfig($decodedJson);
 
         collect(self::$requiredIfMissingInServers)->each(function ($requiredKeys, $key) use ($decodedJson) {
             foreach ($decodedJson['servers'] as $server) {
@@ -167,16 +167,16 @@ class ConfigReader
                     'to' => $server['clone']['to'],
                     'using' => $server['clone']['using'],
                 ],
-                'repo-names' => [
-                    'fromApi' => isset($server['repo-names']['fromApi']) ? [
+                'repoNames' => [
+                    'fromApi' => isset($server['repoNames']['fromApi']) ? [
                         'urls' => self::getApiUrls(
-                            $server['repo-names']['fromApi'],
-                            isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null
+                            $server['repoNames']['fromApi'],
+                            isset($server['repoNames']['token']) ? $server['repoNames']['token'] : null
                         )
                     ] : null,
-                    'pattern' => isset($server['repo-names']['pattern']) ? $server['repo-names']['pattern'] : null,
-                    'names' => isset($server['repo-names']['names']) ? $server['repo-names']['names'] : null,
-                    'token' => isset($server['repo-names']['token']) ? $server['repo-names']['token'] : null,
+                    'pattern' => isset($server['repoNames']['pattern']) ? $server['repoNames']['pattern'] : null,
+                    'names' => isset($server['repoNames']['names']) ? $server['repoNames']['names'] : null,
+                    'token' => isset($server['repoNames']['token']) ? $server['repoNames']['token'] : null,
                 ],
             ];
         });

@@ -154,7 +154,7 @@ Each server needs a name, a path that repos be clone there, git clone command, r
                 "to": "/clone/here",
                 "using": "git@github.com:/amirhossein5/<repo>"
             },
-            "repo-names": {
+            "repoNames": {
                 "names": ["reponame", "anothername"]
             }
         }
@@ -170,10 +170,10 @@ Each server needs a name, a path that repos be clone there, git clone command, r
 If you are using github easily [use](#use-keyword):
 
 ```diff
-"repo-names": {
+"repoNames": {
 -   "names": ["reponame", "anothername"]
 +   "use": {
-+       "from": "pathto/git-backup/stubs/repo-names.github.json",
++       "from": "pathto/git-backup/stubs/repoNames.github.json",
 +       "with": {
 +           "username": "your-github-username"
 +       }
@@ -186,7 +186,7 @@ If you are using github easily [use](#use-keyword):
 For getting repository names from api, you can define a api url, with a pattern to get repository names from response of api:
 
 ```diff
-"repo-names": {
+"repoNames": {
 -   "names": ["reponame", "anothername"]
 +   "fromApi": "https://api.github.com/search/repositories?q=user:yourusername",
 +   "pattern": "items.*.name",
@@ -209,7 +209,7 @@ For getting repository names from api, you can define a api url, with a pattern 
 Sometimes the api url has pagination, for that you can expand `fromApi` like this:
 
 ```hjson
-"repo-names": {
+"repoNames": {
     fromApi:  {
         url: "https://someurl.com/?per_page=50",
         withPagination: true,

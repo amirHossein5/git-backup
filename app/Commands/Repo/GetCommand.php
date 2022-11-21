@@ -81,7 +81,7 @@ class GetCommand extends Command
                 "<comment>{$data['name']}</comment>"
             );
 
-            $repoNames = $this->getRepoNames($data['repo-names']);
+            $repoNames = $this->getRepoNames($data['repoNames']);
 
             if ($repoMatches = $this->option('repo-matches')) {
                 $repoNames = collect($repoNames)
