@@ -220,10 +220,16 @@ class ConfigReader
         $countPages = ceil($total/$perPage);
 
         for ($i=1; $i <= $countPages; $i++) {
-            $urls[] = $apiUrls['url']."&{$pageQueryString}={$i}";
+            $startQueryString = static::hasAnyQueryString($apiUrls['url']) ? '&' : '?';
+            $urls[] = $apiUrls['url']. $startQueryString ."{$pageQueryString}={$i}";
         }
 
         return $urls;
+    }
+
+    private static function hasAnyQueryString(string $url): bool
+    {
+        return isset(parse_url($url)['query']);
     }
 
     private static function getTotalCountFromApi(string $url, ?string $token, string $totalKey): int

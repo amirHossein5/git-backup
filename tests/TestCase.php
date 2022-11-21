@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Services\RepositoryManager;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use LaravelZero\Framework\Testing\TestCase as BaseTestCase;
 
@@ -53,5 +54,12 @@ abstract class TestCase extends BaseTestCase
         mkdir($dirPath);
 
         exec("cd {$dirPath}; git init 2>&1");
+    }
+
+    protected function getServersJson($servers): string
+    {
+        $servers = ['servers' => [Arr::undot($servers)]];
+
+        return json_encode($servers);
     }
 }
