@@ -54,4 +54,24 @@ abstract class TestCase extends BaseTestCase
 
         exec("cd {$dirPath}; git init 2>&1");
     }
+
+    protected function getLongFileName(bool $overlapTerminalWidth = true, int $charLenght = 0): string
+    {
+        $generatedName = '';
+        if ($overlapTerminalWidth) {
+            $terminalWidth = (new \Termwind\Terminal)->width();
+
+            for ($i=0; $i < $terminalWidth + 3; $i++) {
+                $generatedName .= rand(0,9);
+            }
+
+            return $generatedName;
+        }
+
+        for ($i=0; $i < $charLenght; $i++) {
+            $generatedName .= rand(0,9);
+        }
+
+        return $generatedName;
+    }
 }
