@@ -2,6 +2,7 @@
 
 namespace App\Commands\Gist;
 
+use App\Services\GistService;
 use App\Services\JsonDecoder;
 use App\Traits\HasForcedOptions;
 use Illuminate\Console\Scheduling\Schedule;
@@ -24,6 +25,7 @@ class GetCommand extends Command
     protected $signature = 'gist:get
         {--config=}
         {--to-dir=}
+        {--desc-matches= : Filters by gist description.}
     ';
 
     /**
@@ -48,13 +50,23 @@ class GetCommand extends Command
             $this->error("Directory not found: ".$this->option('to-dir'));
             return Output::FAILURE;
         }
-
         if (! is_file($this->option('config'))) {
             $this->error("Config file not found: ".$this->option('config'));
             return Output::FAILURE;
         }
 
-        $decodedJson = JsonDecoder::decodePath($this->option('config'));
+        try {
+            $decodedJson = JsonDecoder::decodePath($this->option('config'));
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+            return Output::FAILURE;
+        }
+
+        if (! isset($decodedJson['username'])) {
+            $this->error('no `username` key found in config.');
+            return Output::FAILURE;
+        }
+
         $username = $decodedJson['username'];
         $token = isset($decodedJson['token']) ? $decodedJson['token'] : null;
         $proceededGists = 0;
@@ -63,22 +75,25 @@ class GetCommand extends Command
         $this->toDir = str($this->option('to-dir'))->rtrim(DIRECTORY_SEPARATOR);
         $this->info('Getting gists...');
 
-        for ($i=1; $i <= 1000; $i++) {
-            $response = $this->getGists($username, $token, page: $i);
+        try {
+            for ($i=1; $i <= 1000; $i++) {
+                $response = $this->getGists($username, $token, page: $i);
 
-            if ($response === []) {
-                break;
-            }
-
-            foreach($response as $gistJson) {
-                try {
-                    $this->backupGist($gistJson);
-                } catch (\Exception $e) {
-                    $this->error($e);
-                    return Output::FAILURE;
+                if ($response === []) {
+                    break;
                 }
-                $proceededGists ++;
+                $response = collect($response)->filter(fn ($gist) =>
+                    str($gist['description'])->contains($this->option('desc-matches'))
+                )->toArray();
+
+                foreach($response as $gistJson) {
+                    $this->backupGist($gistJson);
+                    $proceededGists ++;
+                }
             }
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+            return Output::FAILURE;
         }
 
         $this->newLine();
@@ -113,7 +128,7 @@ class GetCommand extends Command
             : null;
 
         $allGistsDirName = $username ? "{$username}_gists" : 'gists';
-        $gistDirName = $description ? str("{$description}__{$id}")->slug() : $id;
+        $gistDirName = $description ? str("{$description}_{$id}")->slug() : $id;
 
         $allGistsDirPath = str(pathable("{$this->toDir}/{$allGistsDirName}"))->rtrim(DIRECTORY_SEPARATOR);;
         $gistDirPath = str(pathable("{$allGistsDirPath}/{$gistDirName}"))->rtrim(DIRECTORY_SEPARATOR);;
@@ -164,7 +179,7 @@ class GetCommand extends Command
                 $updatedAt = $comment['updated_at'];
 
                 $title = "created_at: [{$createdAt}] updated_at: [{$updatedAt}] author: {$author}";
-                $titleSeparator = $this->createTitleSeparator(len: strlen($title));
+                $titleSeparator = GistService::createTitleSeparator(len: strlen($title));
 
                 $commentsTxtContent .= $titleSeparator.PHP_EOL;
                 $commentsTxtContent .= $title . PHP_EOL;
@@ -181,22 +196,12 @@ class GetCommand extends Command
         }
     }
 
-    private function createTitleSeparator(int $len = 0, $separator = '-'): string
-    {
-        $generatedSeparator = '';
-
-        for ($i=1; $i <= $len ; $i++) {
-            $generatedSeparator .= $separator;
-        }
-
-        return $generatedSeparator;
-    }
-
     private function processFile(string $filename, string $filePath, string $putContents): void
     {
         if (! $fileExists = is_file($filePath)) {
             $this->info("Creating file <comment>$filename</comment>");
             file_put_contents($filePath, $putContents);
+            return;
         }
 
         $update = $fileExists;

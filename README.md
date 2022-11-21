@@ -1,4 +1,4 @@
-This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#githubs-gists), then repos can be put to some disk like dropbox.
+This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#github-gists), then repos can be put to some disk like dropbox.
 Currently available disk: dropbox.
 
 ## Requirements
@@ -65,6 +65,18 @@ gists config which contains `username`, `token`:
     username: "amirHossein5",
     token: "optional"
 }
+```
+
+Gists will be saved in structure of `username_gists/gistDescription-id/..gist files`, and if gist has any comments, comments will be
+on gist directory in file `comments.txt`.
+
+
+### Filtering gists
+
+For filtering gists based on gist description, use option `--desc-matches`:
+
+```sh
+./builds/backup gist:get ... --desc-matches 'some gist'
 ```
 
 ## Putting directory to disk
