@@ -4,11 +4,17 @@
 
 ### Changed
 
--   `from-api` changed to `fromApi` in servers config.
+-   `from-api` changed to `fromApi` in `repo:get` config.
+-   `repo-names` changed to `repoNames` in `repo:get` config.
 
 ### Added
 
--   Add support for paginated urls for getting repository names from api.
+-   Added backuping github gists feature.
+-   Added option `--file` for uploading file in `put` command.
+-   Added fresh,upload remained options when directory already exists in `put` command.
+-   Added log behaviour to `put` command.
+-   Output message improvements of `put` command.
+-   Added support for paginated urls for `repo:get` config.
 
 ## v0.2.1
 
