@@ -15,7 +15,7 @@ trait Loggable
         $isOverlapped = str($fittedFilePath)->endsWith('..');
 
         if ($isOverlapped) {
-            $this->log($logMessage, "- $filePath  $fileSize");
+            $this->log($logMessage, "- $filePath $fileSize");
         } else {
             $this->log($logMessage, "");
         }
@@ -36,9 +36,6 @@ trait Loggable
         $this->progressBar->display();
 
         if ($this->logTo) {
-            if (! file_exists($this->logTo)) {
-                touch($this->logTo);
-            }
             if ($fileLogMessage) {
                 $message = $fileLogMessage;
             }
