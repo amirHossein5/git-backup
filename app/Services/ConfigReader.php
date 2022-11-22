@@ -221,7 +221,7 @@ class ConfigReader
 
         for ($i=1; $i <= $countPages; $i++) {
             $startQueryString = static::hasAnyQueryString($apiUrls['url']) ? '&' : '?';
-            $urls[] = $apiUrls['url']. $startQueryString ."{$pageQueryString}={$i}";
+            $urls[] = $apiUrls['url'] . $startQueryString . "{$pageQueryString}={$i}";
         }
 
         return $urls;

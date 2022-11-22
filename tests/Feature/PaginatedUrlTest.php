@@ -73,7 +73,7 @@ test('generates paginated urls', function () {
     expect($urls)->toHaveLength(4);
 
     for ($i=0; $i <= 3; $i++) {
-        expect($urls[$i])->toBe("someurl.com?page=".$i+1);
+        expect($urls[$i])->toBe("someurl.com?page=" . $i+1);
     }
 
     $serversJson = $this->getServersJson([
@@ -94,7 +94,7 @@ test('generates paginated urls', function () {
     expect($urls)->toHaveLength(4);
 
     for ($i=0; $i <= 3; $i++) {
-        expect($urls[$i])->toBe("someurl.com?per_page=2&another&page=".$i+1);
+        expect($urls[$i])->toBe("someurl.com?per_page=2&another&page=" . $i+1);
     }
 });
 
@@ -118,7 +118,7 @@ test('query string is changeable', function () {
     expect($urls)->toHaveLength(4);
 
     for ($i=0; $i <= 3; $i++) {
-        expect($urls[$i])->toBe("someurl.com?key=".$i+1);
+        expect($urls[$i])->toBe("someurl.com?key=" . $i+1);
     }
 
     $serversJson = $this->getServersJson([
@@ -140,7 +140,7 @@ test('query string is changeable', function () {
     expect($urls)->toHaveLength(4);
 
     for ($i=0; $i <= 3; $i++) {
-        expect($urls[$i])->toBe("someurl.com?per_page=2&another&key=".$i+1);
+        expect($urls[$i])->toBe("someurl.com?per_page=2&another&key=" . $i+1);
     }
 });
 
@@ -171,6 +171,6 @@ test('getting total items from api', function () {
     expect($urls)->toHaveLength(4);
 
     for ($i=0; $i <= 3; $i++) {
-        expect($urls[$i])->toBe("someurl.com?page=".$i+1);
+        expect($urls[$i])->toBe("someurl.com?page=" . $i+1);
     }
 });

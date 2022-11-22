@@ -21,7 +21,7 @@ class Terminal
             $firstCol = str($firstCol)->replaceLast('-', ' ');
         }
 
-        return $firstCol.$secondCol;
+        return $firstCol . $secondCol;
     }
 
     public static function clearTags(string $string): string
