@@ -81,11 +81,12 @@ class GetCommand extends Command
                 if ($response === []) {
                     break;
                 }
-                $response = collect($response)->filter(
-                    fn ($gist) =>
-                    str($gist['description'])->contains($this->option('desc-matches'))
-                )->toArray();
-
+                if ($this->option('desc-matches')) {
+                    $response = collect($response)->filter(
+                        fn ($gist) =>
+                        str($gist['description'])->contains($this->option('desc-matches'))
+                    )->toArray();
+                }
 
                 foreach ($response as $gistJson) {
                     $this->backupGist($gistJson);
