@@ -12,8 +12,8 @@ beforeEach(function () {
                     'to' => 'some path',
                     'using' => 'git c',
                 ],
-                'repo-names' => [
-                    'from-api' => null,
+                'repoNames' => [
+                    'fromApi' => null,
                     'pattern' => null,
                     'names' => 'a repo name',
                     'token' => null,
@@ -33,7 +33,7 @@ test('adds keys to array', function () {
                     to: some path
                     using: git c
                 },
-                repo-names: {
+                repoNames: {
                     names: a repo name
                 }
             }
@@ -58,7 +58,7 @@ test('adds keys to array', function () {
             to: some path
             using: git c
         },
-        repo-names: {
+        repoNames: {
             names: a repo name
         }
     }
@@ -101,7 +101,7 @@ test('adds keys to array, without rewriting previous ones', function () {
                 clone: {
                     to: some path
                 },
-                repo-names: {
+                repoNames: {
                     names: a repo name
                 }
             }
@@ -137,7 +137,7 @@ test('adds keys to array, with vars', function () {
                         clone.using: git c
                     }
                 },
-                repo-names: {
+                repoNames: {
                     names: a repo name
                 }
             }
