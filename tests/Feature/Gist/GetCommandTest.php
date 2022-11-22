@@ -79,6 +79,92 @@ it('fails on wrong gist token', function () {
         ->assertExitCode(Command::FAILURE);
 });
 
+it('gets all gists and checks file for updates', function () {
+    Http::fake($this->gistFakeList());
+
+    $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
+    $toDir = pathable(base_path('tests/temp1'));
+    Storage::disk('local')->deleteDirectory('tests/temp1');
+    Storage::disk('local')->makeDirectory('tests/temp1');
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        username: amirHossein5
+    }
+    EOL);
+
+    $this->artisan("gist:get --to-dir $toDir --config $pathToConfig")
+        ->expectsOutput('Getting gists...')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing sublime-text')
+        ->expectsOutput('Creating file first-file.txt')
+        ->expectsOutput('Creating file second-file.txt')
+        ->expectsOutput('Creating file third-file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing purifier')
+        ->expectsOutput('Creating file config.php')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Total proceeded gists: 2')
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(FileManager::allDir($toDir))->toHaveCount(1);
+    expect(FileManager::allFiles($toDir))->toHaveCount(0);
+    $this->checkUserDownloadedGists("$toDir/amirHossein5_gists", [
+        [
+            'id' => '7e7516537cb090305d1cfc8a2034fc0c',
+            'description' => 'purifier',
+            'files' => [
+                'config.php' => 'config file of purifier'
+            ]
+        ],
+        [
+            'id' => '6aa8e71d0821662073b20c21acde635c',
+            'description' => 'sublime-text',
+            'files' => [
+                'first-file.txt' => 'first file contents',
+                'second-file.txt' => 'second file contents',
+                'third-file.txt' => 'third file contents',
+            ]
+        ]
+    ]);
+
+    // check for update
+    $this->artisan("gist:get --to-dir $toDir --config $pathToConfig")
+        ->expectsOutput('Getting gists...')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing sublime-text')
+        ->expectsOutput('Checked file first-file.txt')
+        ->expectsOutput('Checked file second-file.txt')
+        ->expectsOutput('Checked file third-file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing purifier')
+        ->expectsOutput('Checked file config.php')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Total proceeded gists: 2')
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(FileManager::allDir($toDir))->toHaveCount(1);
+    expect(FileManager::allFiles($toDir))->toHaveCount(0);
+    $this->checkUserDownloadedGists("$toDir/amirHossein5_gists", [
+        [
+            'id' => '7e7516537cb090305d1cfc8a2034fc0c',
+            'description' => 'purifier',
+            'files' => [
+                'config.php' => 'config file of purifier'
+            ]
+        ],
+        [
+            'id' => '6aa8e71d0821662073b20c21acde635c',
+            'description' => 'sublime-text',
+            'files' => [
+                'first-file.txt' => 'first file contents',
+                'second-file.txt' => 'second file contents',
+                'third-file.txt' => 'third file contents',
+            ]
+        ]
+    ]);
+});
+
 it('gets filtered gists and checks files for updates', function () {
     Http::fake($this->gistFakeList());
 
@@ -137,6 +223,58 @@ it('gets filtered gists and checks files for updates', function () {
     ]);
 });
 
+it('updates all gists', function () {
+    Http::fake($this->gistFakeList());
+
+    $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
+    $toDir = pathable(base_path('tests/temp1'));
+    Storage::disk('local')->deleteDirectory('tests/temp1');
+    Storage::disk('local')->put('tests/temp1/amirHossein5_gists/purifier-7e7516537cb090305d1cfc8a2034fc0c/config.php', 'some old content');
+    Storage::disk('local')->put('tests/temp1/amirHossein5_gists/sublime-text-6aa8e71d0821662073b20c21acde635c/second-file.txt', 'some old content');
+    Storage::disk('local')->put('tests/temp1/amirHossein5_gists/sublime-text-6aa8e71d0821662073b20c21acde635c/third-file.txt', 'third file contents');
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        username: amirHossein5
+    }
+    EOL);
+
+    $this->artisan("gist:get --to-dir $toDir --config $pathToConfig")
+        ->expectsOutput('Getting gists...')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing sublime-text')
+        ->expectsOutput('Creating file first-file.txt')
+        ->expectsOutput('Updating file second-file.txt')
+        ->expectsOutput('Checked file third-file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing purifier')
+        ->expectsOutput('Updating file config.php')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Total proceeded gists: 2')
+        ->assertExitCode(Command::SUCCESS);
+
+    expect(FileManager::allDir($toDir))->toHaveCount(1);
+    expect(FileManager::allFiles($toDir))->toHaveCount(0);
+    $this->checkUserDownloadedGists("$toDir/amirHossein5_gists", [
+        [
+            'id' => '7e7516537cb090305d1cfc8a2034fc0c',
+            'description' => 'purifier',
+            'files' => [
+                'config.php' => 'config file of purifier'
+            ]
+        ],
+        [
+            'id' => '6aa8e71d0821662073b20c21acde635c',
+            'description' => 'sublime-text',
+            'files' => [
+                'first-file.txt' => 'first file contents',
+                'second-file.txt' => 'second file contents',
+                'third-file.txt' => 'third file contents',
+            ]
+        ]
+    ]);
+});
+
 it('updates filtered gist', function () {
     Http::fake($this->gistFakeList());
 
@@ -173,7 +311,60 @@ it('updates filtered gist', function () {
     ]);
 });
 
-it('gets gist comments', function () {
+it('gets all gists comments', function () {
+    Http::fake($this->gistFakeList(hasComments: true));
+
+    $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
+    $toDir = pathable(base_path('tests/temp1'));
+    Storage::disk('local')->deleteDirectory('tests/temp1');
+    Storage::disk('local')->makeDirectory('tests/temp1');
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        username: amirHossein5
+    }
+    EOL);
+
+    $this->artisan("gist:get --to-dir $toDir --config $pathToConfig")
+        ->expectsOutput('Getting gists...')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing sublime-text')
+        ->expectsOutput('Creating file first-file.txt')
+        ->expectsOutput('Creating file second-file.txt')
+        ->expectsOutput('Creating file third-file.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Processing purifier')
+        ->expectsOutput('Creating file config.php')
+        ->expectsOutput('Creating file comments.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Total proceeded gists: 2')
+        ->assertExitCode(Command::SUCCESS);
+
+    $responseComments = Http::retry(3, 100)->get("https://api.github.com/gists/7e7516537cb090305d1cfc8a2034fc0c/comments?page=1")->json();
+    $commentsTxtContent = '';
+
+    foreach ($responseComments as $comment) {
+        $author = $comment['user']['login'];
+        $body = $comment['body'];
+        $createdAt = $comment['created_at'];
+        $updatedAt = $comment['updated_at'];
+
+        $title = "created_at: [{$createdAt}] updated_at: [{$updatedAt}] author: {$author}";
+        $titleSeparator = GistService::createTitleSeparator(len: strlen($title));
+
+        $commentsTxtContent .= $titleSeparator . PHP_EOL;
+        $commentsTxtContent .= $title . PHP_EOL;
+        $commentsTxtContent .= $titleSeparator . PHP_EOL;
+        $commentsTxtContent .= $body . PHP_EOL;
+    }
+    $commentsTxtContent = str($commentsTxtContent)->trim(PHP_EOL)->toString();
+
+    expect(file_get_contents(
+        pathable('tests/temp1/amirHossein5_gists/' . str('purifier-7e7516537cb090305d1cfc8a2034fc0c')->slug() . '/comments.txt')
+    ))->toContain($commentsTxtContent);
+});
+
+it('gets filtered gist comments', function () {
     Http::fake($this->gistFakeList(hasComments: true));
 
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');

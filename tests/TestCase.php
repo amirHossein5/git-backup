@@ -54,6 +54,11 @@ abstract class TestCase extends BaseTestCase
             'https://api.github.com/users/amirHossein5/gists?per_page=50&page=1*' => Http::response(JsonDecoder::decodePath(__DIR__ . '/FakeResponses/amirHossein5-gists.json')),
             'https://api.github.com/users/amirHossein5/gists?per_page=50&page=*' => Http::response([]),
             'https://gist.githubusercontent.com/amirHossein5/7e7516537cb090305d1cfc8a2034fc0c/raw/10ed03d7abf309ef343c6add905d5040f76158a1/config.php' => Http::response('config file of purifier'),
+
+            "https://api.github.com/gists/6aa8e71d0821662073b20c21acde635c/comments*" => Http::response(''),
+            "https://gist.githubusercontent.com/amirHossein5/6aa8e71d0821662073b20c21acde635c/raw/1234/first-file.txt" => Http::response('first file contents'),
+            "https://gist.githubusercontent.com/amirHossein5/6aa8e71d0821662073b20c21acde635c/raw/2345/second-file.txt" => Http::response('second file contents'),
+            "https://gist.githubusercontent.com/amirHossein5/6aa8e71d0821662073b20c21acde635c/raw/3456/third-file.txt" => Http::response('third file contents'),
         ];
 
         if ($hasComments) {
