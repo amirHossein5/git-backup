@@ -2,6 +2,7 @@
 
 use App\Commands\PutCommand;
 use App\Services\FileManager;
+use App\Services\Terminal;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Command\Command;
 
@@ -640,4 +641,49 @@ it('will reupload file if already exists', function () {
         Storage::disk('local')->deleteDirectory($dirName) &&
         Storage::disk('local')->delete('file.txt')
     )->toBeTrue();
+});
+
+it('checks file exists for logging', function () {
+    $this->artisan('put --dir app/ --disk local --log-to some-not-found-directory')
+        ->expectsOutput('File for logging not found: some-not-found-directory')
+        ->assertExitCode(Command::FAILURE);
+});
+
+it('logs uploaded directories and files to log file', function () {
+    $longFileName = $this->getLongFileName();
+
+    Storage::disk('local')->deleteDirectory('tests/temp');
+    Storage::disk('local')->deleteDirectory('temp');
+    Storage::disk('local')->delete('tests/temp1/log.txt');
+    Storage::disk('local')->makeDirectory('tests/temp/empty/dir');
+    Storage::disk('local')->put('tests/temp/file.txt', 'file content');
+    Storage::disk('local')->put('tests/temp/' . $longFileName . '.txt', 'file content');
+    touch('tests/temp1/log.txt');
+
+    $totalSize = filesize('tests/temp/file.txt') + filesize("tests/temp/$longFileName.txt");
+    $fileSize = readable_size(filesize('tests/temp/file.txt'));
+    $longNameFileSize = readable_size(filesize("tests/temp/$longFileName.txt"));
+    $fittedLongFileName = Terminal::fitWidth($longFileName, usedWidth: strlen("($longNameFileSize)") + 8);
+
+    $this->artisan('put --dir tests/temp --disk local --log-to tests/temp1/log.txt')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Checking disk...')
+        ->expectsOutput('Uploading to disk: local, path: temp/')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput("- temp/$fittedLongFileName ($longNameFileSize)")
+        ->expectsOutput("- temp/file.txt ----------------------------------------------------- ($fileSize)")
+        ->expectsOutput('d temp/empty/dir')
+        ->expectsOutput(PHP_EOL)
+        ->expectsOutput('Uploaded tests/temp to temp/ successfully.')
+        ->expectsOutput('total uploaded file size: ' . readable_size($totalSize))
+        ->assertExitCode(Command::SUCCESS);
+
+    $logFileArray = explode(PHP_EOL, file_get_contents('tests/temp1/log.txt'));
+
+    expect($logFileArray)->toHaveLength(3);
+    $prefix = '[' . now() . '] ';
+
+    expect($logFileArray[2])->toBe($prefix . 'd temp/empty/dir');
+    expect($logFileArray[1])->toBe($prefix . "- temp/file.txt ----------------------------------------------------- ($fileSize)");
+    expect($logFileArray[0])->toBe($prefix . "- temp/$longFileName.txt ($longNameFileSize)");
 });

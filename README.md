@@ -1,4 +1,4 @@
-This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#githubs-gists), then repos can be put to some disk like dropbox.
+This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#github-gists), then repos can be put to some disk like dropbox.
 Currently available disk: dropbox.
 
 ## Requirements
@@ -65,6 +65,18 @@ gists config which contains `username`, `token`:
     username: "amirHossein5",
     token: "optional"
 }
+```
+
+Gists will be saved in structure of `username_gists/gistDescription-id/..gist files`, and if gist has any comments, comments will be
+on gist directory in file `comments.txt`.
+
+
+### Filtering gists
+
+For filtering gists based on gist description, use option `--desc-matches`:
+
+```sh
+./builds/backup gist:get ... --desc-matches 'some gist'
 ```
 
 ## Putting directory to disk
@@ -183,7 +195,7 @@ Each server needs a name, a path that repos be clone there, git clone command, r
                 "to": "/clone/here",
                 "using": "git@github.com:/amirhossein5/<repo>"
             },
-            "repo-names": {
+            "repoNames": {
                 "names": ["reponame", "anothername"]
             }
         }
@@ -199,14 +211,15 @@ Each server needs a name, a path that repos be clone there, git clone command, r
 If you are using github easily [use](#use-keyword):
 
 ```diff
-"repo-names": {
+"repoNames": {
 -   "names": ["reponame", "anothername"]
 +   "use": {
-+       "from": "pathto/git-backup/stubs/repo-names.github.json",
++       "from": "pathto/git-backup/stubs/repoNames.github.json",
 +       "with": {
 +           "username": "your-github-username"
 +       }
 +   },
++   "token": "if has token"
 }
 ```
 
@@ -215,9 +228,9 @@ If you are using github easily [use](#use-keyword):
 For getting repository names from api, you can define a api url, with a pattern to get repository names from response of api:
 
 ```diff
-"repo-names": {
+"repoNames": {
 -   "names": ["reponame", "anothername"]
-+   "from-api": "https://api.github.com/search/repositories?q=user:yourusername",
++   "fromApi": "https://api.github.com/search/repositories?q=user:yourusername",
 +   "pattern": "items.*.name",
 +   "token": "if has token"
 }
@@ -226,16 +239,51 @@ For getting repository names from api, you can define a api url, with a pattern 
 `"pattern": "items.*.name"` based on api response means:
 
 ```php
-[
-    // ...
-    "items" => [
-        0 => [
-            "name" => "repo name"
-        ]
-        1 => // ...,
-        2 => // ...,
+"items" => [
+    0 => [
+        "name" => "repo name" //...
     ]
-]
+    1 => // ...
+```
+
+### Using paginated api url
+
+Sometimes the api url has pagination, for that you can expand `fromApi` like this:
+
+```hjson
+"repoNames": {
+    fromApi:  {
+        url: "https://someurl.com/?per_page=50",
+        withPagination: true,
+        total: 100
+        perPage: 50
+    }
+}
+```
+
+`total` also can be get from api too:
+
+```diff
+fromApi:  {
+    url: "https://someurl.com/?per_page=50",
+    withPagination: true,
+-   total: 100
++   total: "https://api.github.com/search/repositories?q=user:amirHossein5",
++   totalKey: "total_count"
+    perPage: 50
+}
+```
+
+`totalKey` stands for key of response json which has total.
+
+By default the query string for pages(`?page=2`) is `page` for customizing that pass `pageQueryString`:
+
+```diff
+fromApi:  {
+    url: "https://someurl.com/?per_page=50",
+    withPagination: true,
++   pageQueryString: "pg",
+//...
 ```
 
 ## `use` keyword
