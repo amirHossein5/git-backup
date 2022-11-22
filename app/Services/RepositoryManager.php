@@ -61,7 +61,7 @@ class RepositoryManager
 
     public static function getPatternFromApi(string $url, null|string $token = null, string $pattern = '*.name'): Collection
     {
-        $http = Http::acceptJson();
+        $http = Http::retry(3, 100)->acceptJson();
 
         if ($token) {
             $http->withToken($token);

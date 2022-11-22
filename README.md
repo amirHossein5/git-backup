@@ -1,5 +1,4 @@
-This package clones/fetches(mirrored) repos from specified server(s), then repos can be put to some disk like dropbox.
-
+This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#github-gists), then repos can be put to some disk like dropbox.
 Currently available disk: dropbox.
 
 ## Requirements
@@ -51,9 +50,38 @@ For filtering repo names, use option `--repo-matches`:
 
 Then it will search for repositories that their names **contains** specified passed string.
 
+## Github Gists
+
+It will get all pages's gists with it's comments. For getting all gists, with their comments(if has any) use:
+
+```sh
+./builds/backup gist:get --config gists.hjson --to-dir ~/gists/
+```
+
+gists config which contains `username`, `token`:
+
+```hjson
+{
+    username: "amirHossein5",
+    token: "optional"
+}
+```
+
+Gists will be saved in structure of `username_gists/gistDescription-id/..gist files`, and if gist has any comments, comments will be
+on gist directory in file `comments.txt`.
+
+
+### Filtering gists
+
+For filtering gists based on gist description, use option `--desc-matches`:
+
+```sh
+./builds/backup gist:get ... --desc-matches 'some gist'
+```
+
 ## Putting directory to disk
 
-For putting some **directory** to a [disk](#show-disk-command), run:
+For putting a **directory** to a [disk](#show-disk-command), run:
 
 ```sh
 ./builds/backup put --dir=/path/upload-dir --disk=disk-name
@@ -65,22 +93,22 @@ For putting some **directory** to a [disk](#show-disk-command), run:
 
 ### Options when directory already exists in disk
 
-If directory that you're uploading already exists in the specfied disk, then some options will be show you, like 
+If directory that you're uploading already exists in the specfied disk, then some options will be show you, like
 
-- deleting directory from disk
-    - this just removes the uploaded directory from disk
-- fresh directory
-    - deletes uploaded folder, then uploads current directory
-- selecting new name
-    - equilvant of `--to-dir`, uploads directory with another dir name
-- replace directory
-    - replaces directory with previously uploaded one
-    - files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
-- merge directory
-    - uploads new files, or files that are different with previously uploaded ones
-    - creates empty directories that aren't exists in uploaded folder
-- upload remained things
-    - uploads files, and directories that aren't exists.
+-   deleting directory from disk
+    -   this just removes the uploaded directory from disk
+-   fresh directory
+    -   deletes uploaded folder, then uploads current directory
+-   selecting new name
+    -   equilvant of `--to-dir`, uploads directory with another dir name
+-   replace directory
+    -   replaces directory with previously uploaded one
+    -   files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
+-   merge directory
+    -   uploads new files, or files that are different with previously uploaded ones
+    -   creates empty directories that aren't exists in uploaded folder
+-   upload remained things
+    -   uploads files, and directories that aren't exists.
 
 ### Specifying destination path
 
