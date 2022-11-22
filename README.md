@@ -215,7 +215,7 @@ If you are using github easily [use](#use-keyword):
 "repoNames": {
 -   "names": ["reponame", "anothername"]
 +   "use": {
-+       "from": "pathto/git-backup/stubs/repoNames.github.json",
++       "from": "pathto/git-backup/stubs/repo-names.github.json",
 +       "with": {
 +           "username": "your-github-username"
 +       }
