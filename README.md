@@ -1,4 +1,5 @@
-This package [clones/fetches(mirrored)](#getting-all-repositories-from-servers) repos from specified server(s), or [github's gists](#github-gists), then repos can be put to some disk like dropbox.
+This package [clones/fetches](#getting-all-repositories-from-servers)(mirrored) repos from specified server(s), then repos can be put to some disk like dropbox. Also backup option for [github's gists](#github-gists) is available.
+
 Currently available disk: dropbox.
 
 ## Requirements
@@ -23,7 +24,7 @@ Then you can see available commands via:
 
 ## Getting all repositories from server(s)
 
-For cloning/fetching repositories from server(s), you need a [config file that you specify servers](#configuring-servers),
+For cloning/fetching repositories from server(s), you need a [config file which servers be specified there](#configuring-servers),
 then pass the config file path to command:
 
 ```sh
@@ -67,8 +68,8 @@ gists config which contains `username`, `token`:
 }
 ```
 
-Gists will be saved in structure of `username_gists/gistDescription-id/..gist files`, and if gist has any comments, comments will be
-on gist directory in file `comments.txt`.
+Gist files will be saved in structure of `username_gists/gistDescription-id/`, and if gist has any comments, comments will be
+saved in gist directory in file `comments.txt`.
 
 
 ### Filtering gists
@@ -79,7 +80,7 @@ For filtering gists based on gist description, use option `--desc-matches`:
 ./builds/backup gist:get ... --desc-matches 'some gist'
 ```
 
-## Putting directory to disk
+## Upload to disk
 
 For putting a **file** to a [disk](#show-disk-command), run:
 
@@ -99,40 +100,6 @@ For putting a **directory** to a [disk](#show-disk-command), run:
 -   `--dir` is directory which you want to upload.
 -   For option `--disk`, pass the name of disk. [See available disks](#show-disk-command).
 
-### Options when directory already exists in disk
-
-If directory that you're uploading already exists in the specfied disk, then some options will be show you, like
-
--   deleting directory from disk
-    -   this just removes the uploaded directory from disk
--   fresh directory
-    -   deletes uploaded folder, then uploads current directory
--   selecting new name
-    -   equilvant of `--to-dir`, uploads directory with another dir name
--   replace directory
-    -   replaces directory with previously uploaded one
-    -   files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
--   merge directory
-    -   uploads new files, or files that are different with previously uploaded ones
-    -   creates empty directories that aren't exists in uploaded folder
--   upload remained things
-    -   uploads files, and directories that aren't exists.
-
-> when using `replace directory` option, directory which is on the disk, will be moved to `uniqueid.tmp`, then
-when upload has finished, the tmp directory will be removed.
-
-### Specifying destination path
-
-By default your directory will be upload to directory of `--dir` option.
-Or if it's uploading file, it will be upload to the root of disk.
-If you want to specfiy custom path that your folder\file will be upload there, use `--to-dir`
-
-```sh
-./builds/backup put ... --to-dir=some/path
-```
-
-Now it will be upload to directory of: `some/path/`.
-
 ### Disk Tokens
 
 Sometimes for uploading to some disks, you need some tokens, e.g, dropbox needs key, secret, authorization_token for upload. So define the disk tokens in json file,
@@ -151,6 +118,40 @@ e.g, json file for dropbox:
 ```sh
 ./builds/backup put ... --disk-tokens=path/to/disk-auth.json
 ```
+
+### Options when directory already exists in disk
+
+If directory that you're uploading already exists in the specfied disk, then some options will be show you, like
+
+-   Deleting directory from disk
+    -   This just removes the uploaded directory from disk
+-   Fresh directory
+    -   Deletes uploaded folder, then uploads current directory
+-   Selecting new name
+    -   Uploads directory with another dir name
+-   Replace directory
+    -   Replaces directory with previously uploaded one
+    -   Files that are same with previously uploaded ones, won't be upload again, (uses uploaded one)
+-   Merge directory
+    -   Uploads new files, or files that are different with previously uploaded ones
+    -   Creates empty directories that aren't exists in uploaded folder
+-   Upload remained things
+    -   Uploads files, and directories that aren't exists.
+
+When using `replace directory` option, directory which is on the disk, will be moved to `uniqueid.tmp`, then
+when upload has finished, the tmp directory will be removed.
+
+### Specifying destination path
+
+By default your directory will be upload to directory which has name of `--dir` directory name option.
+Or if it's uploading file, it will be upload to the root of disk.
+If you want to specfiy custom path that your folder\file will be upload there, use `--to-dir`
+
+```sh
+./builds/backup put ... --to-dir=some/path
+```
+
+Now it will be upload to directory of: `some/path/`.
 
 ### Logging
 
@@ -288,7 +289,7 @@ fromApi:  {
 
 ## `use` keyword
 
-> `use` keyword is only available in `repo:get` command
+`use` keyword is only available in `repo:get` command config file.
 
 The `use` keyword is for including json keys inside current json file(keys won't be override).
 
