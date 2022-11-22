@@ -89,7 +89,7 @@ class PutCommand extends Command
 
         if ($this->logTo) {
             if (! is_file($this->logTo)) {
-                $this->error('File for logging not found: '.$this->logTo);
+                $this->error('File for logging not found: ' . $this->logTo);
                 return Output::FAILURE;
             }
         }

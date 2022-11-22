@@ -59,17 +59,17 @@ abstract class TestCase extends BaseTestCase
     {
         $generatedName = '';
         if ($overlapTerminalWidth) {
-            $terminalWidth = (new \Termwind\Terminal)->width();
+            $terminalWidth = (new \Termwind\Terminal())->width();
 
             for ($i=0; $i < $terminalWidth + 3; $i++) {
-                $generatedName .= rand(0,9);
+                $generatedName .= rand(0, 9);
             }
 
             return $generatedName;
         }
 
         for ($i=0; $i < $charLenght; $i++) {
-            $generatedName .= rand(0,9);
+            $generatedName .= rand(0, 9);
         }
 
         return $generatedName;

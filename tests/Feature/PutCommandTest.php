@@ -492,7 +492,7 @@ it('logs uploaded directories and files to log file', function () {
     Storage::disk('local')->delete('tests/temp1/log.txt');
     Storage::disk('local')->makeDirectory('tests/temp/empty/dir');
     Storage::disk('local')->put('tests/temp/file.txt', 'file content');
-    Storage::disk('local')->put('tests/temp/'.$longFileName.'.txt', 'file content');
+    Storage::disk('local')->put('tests/temp/' . $longFileName . '.txt', 'file content');
     touch('tests/temp1/log.txt');
 
     $totalSize = filesize('tests/temp/file.txt') + filesize("tests/temp/$longFileName.txt");
@@ -510,15 +510,15 @@ it('logs uploaded directories and files to log file', function () {
         ->expectsOutput('d temp/empty/dir')
         ->expectsOutput(PHP_EOL)
         ->expectsOutput('Uploaded tests/temp to temp/ successfully.')
-        ->expectsOutput('total uploaded file size: '.readable_size($totalSize))
+        ->expectsOutput('total uploaded file size: ' . readable_size($totalSize))
         ->assertExitCode(Command::SUCCESS);
 
     $logFileArray = explode(PHP_EOL, file_get_contents('tests/temp1/log.txt'));
 
     expect($logFileArray)->toHaveLength(3);
-    $prefix = '['.now().'] ';
+    $prefix = '[' . now() . '] ';
 
-    expect($logFileArray[2])->toBe($prefix.'d temp/empty/dir');
-    expect($logFileArray[1])->toBe($prefix."- temp/file.txt ----------------------------------------------------- ($fileSize)");
-    expect($logFileArray[0])->toBe($prefix."- temp/$longFileName.txt ($longNameFileSize)");
+    expect($logFileArray[2])->toBe($prefix . 'd temp/empty/dir');
+    expect($logFileArray[1])->toBe($prefix . "- temp/file.txt ----------------------------------------------------- ($fileSize)");
+    expect($logFileArray[0])->toBe($prefix . "- temp/$longFileName.txt ($longNameFileSize)");
 });
