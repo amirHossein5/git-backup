@@ -209,14 +209,14 @@ it('gets gist comments', function () {
         $title = "created_at: [{$createdAt}] updated_at: [{$updatedAt}] author: {$author}";
         $titleSeparator = GistService::createTitleSeparator(len: strlen($title));
 
-        $commentsTxtContent .= $titleSeparator.PHP_EOL;
+        $commentsTxtContent .= $titleSeparator . PHP_EOL;
         $commentsTxtContent .= $title . PHP_EOL;
-        $commentsTxtContent .= $titleSeparator.PHP_EOL;
-        $commentsTxtContent .= $body.PHP_EOL;
+        $commentsTxtContent .= $titleSeparator . PHP_EOL;
+        $commentsTxtContent .= $body . PHP_EOL;
     }
     $commentsTxtContent = str($commentsTxtContent)->trim(PHP_EOL)->toString();
 
     expect(file_get_contents(
-        pathable('tests/temp1/amirHossein5_gists/'.str('purifier-7e7516537cb090305d1cfc8a2034fc0c')->slug().'/comments.txt')
+        pathable('tests/temp1/amirHossein5_gists/' . str('purifier-7e7516537cb090305d1cfc8a2034fc0c')->slug() . '/comments.txt')
     ))->toContain($commentsTxtContent);
 });

@@ -47,15 +47,16 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
-    protected function gistFakeList($hasComments = false): array {
+    protected function gistFakeList($hasComments = false): array
+    {
         $fakeList = [
-            'https://api.github.com/users/amirHossein5/gists?per_page=50&page=1*' => Http::response(JsonDecoder::decodePath(__DIR__.'/FakeResponses/amirHossein5-gists.json')),
+            'https://api.github.com/users/amirHossein5/gists?per_page=50&page=1*' => Http::response(JsonDecoder::decodePath(__DIR__ . '/FakeResponses/amirHossein5-gists.json')),
             'https://api.github.com/users/amirHossein5/gists?per_page=50&page=*' => Http::response([]),
             'https://gist.githubusercontent.com/amirHossein5/7e7516537cb090305d1cfc8a2034fc0c/raw/10ed03d7abf309ef343c6add905d5040f76158a1/config.php' => Http::response('config file of purifier'),
         ];
 
         if ($hasComments) {
-            $fakeList["https://api.github.com/gists/7e7516537cb090305d1cfc8a2034fc0c/comments?page=1*"] = Http::response(JsonDecoder::decodePath(__DIR__.'/FakeResponses/gist-comments.json'));
+            $fakeList["https://api.github.com/gists/7e7516537cb090305d1cfc8a2034fc0c/comments?page=1*"] = Http::response(JsonDecoder::decodePath(__DIR__ . '/FakeResponses/gist-comments.json'));
         }
 
         $fakeList['https://api.github.com/gists/7e7516537cb090305d1cfc8a2034fc0c/comments*'] = Http::response('');
@@ -80,7 +81,7 @@ abstract class TestCase extends BaseTestCase
         expect(is_dir($userDirPath))->toBeTrue();
 
         foreach ($gists as $gist) {
-            $gistDirName = str($gist['description'].'-'.$gist['id'])->slug();
+            $gistDirName = str($gist['description'] . '-' . $gist['id'])->slug();
             $gistPath = pathable("$userDirPath/$gistDirName");
 
             expect(FileManager::allDir($gistPath))->toHaveCount(0);
