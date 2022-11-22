@@ -62,7 +62,7 @@ abstract class TestCase extends BaseTestCase
 
         return json_encode($servers);
     }
-    
+
     protected function getLongFileName(bool $overlapTerminalWidth = true, int $charLenght = 0): string
     {
         $generatedName = '';
