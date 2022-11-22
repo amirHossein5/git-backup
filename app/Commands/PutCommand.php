@@ -45,6 +45,7 @@ class PutCommand extends Command
      */
     protected $signature = 'put
         {--dir=}
+        {--file=}
         {--disk= : See disks via, show:disk }
         {--to-dir= : Put in disk path.}
         {--disk-tokens= : Path to json file that contains disk authorization items.}
@@ -71,41 +72,51 @@ class PutCommand extends Command
     {
         $this->cursor = new Cursor($this->output);
 
-        if (! $this->hasAllOptions('disk', 'dir')) {
+        if (! $this->hasAllOptions('disk')) {
+            return Output::FAILURE;
+        }
+        if (! $this->option('dir') and ! $this->option('file')) {
+            $this->error('Option --dir is required.');
             return Output::FAILURE;
         }
 
         $disk = $this->option('disk');
-        $dirPath = pathable($this->option('dir'));
-        $toDir = $this->option('to-dir');
-        $dirPathWillBe = $toDir ? pathable($toDir) : basename($dirPath);
-        $dirPathWillBe = str($dirPathWillBe)->rtrim(DIRECTORY_SEPARATOR);
-        $showDiskCommand = getArtisanCommand('show:disk');
         $tokensPath = pathable($this->option('disk-tokens'));
+        $showDiskCommand = getArtisanCommand('show:disk');
 
         $this->logTo = $this->option('log-to');
         $this->disk = $disk;
-        $this->dirPathWillBe = $dirPathWillBe;
 
         if ($this->logTo) {
             if (! is_file($this->logTo)) {
                 $this->error('File for logging not found: ' . $this->logTo);
-
                 return Output::FAILURE;
             }
         }
-        if (! is_dir($dirPath)) {
-            $this->error("Directory not found {$dirPath}");
-            return Output::FAILURE;
-        }
-
         if (! config("filesystems.disks.{$disk}")) {
             $this->error("disk {$disk} not found.");
             $this->line("See available disk list via, {$showDiskCommand}");
             return Output::FAILURE;
         }
-
         if (! $this->manageDiskTokens($tokensPath, $disk)) {
+            return Output::FAILURE;
+        }
+
+        if ($this->option('file')) {
+            return $this->manageFileUploads(
+                filePath: $this->option('file'),
+                toDir: $this->option('to-dir')
+            );
+        }
+
+        $dirPath = pathable($this->option('dir'));
+        $toDir = $this->option('to-dir');
+        $dirPathWillBe = $toDir ? pathable($toDir) : basename($dirPath);
+        $dirPathWillBe = str($dirPathWillBe)->rtrim(DIRECTORY_SEPARATOR);
+        $this->dirPathWillBe = $dirPathWillBe;
+
+        if (! is_dir($dirPath)) {
+            $this->error("Directory not found {$dirPath}");
             return Output::FAILURE;
         }
 
@@ -116,7 +127,6 @@ class PutCommand extends Command
             $exists = Storage::disk($disk)->directoryExists($dirPathWillBe);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
-
             return Output::FAILURE;
         }
 

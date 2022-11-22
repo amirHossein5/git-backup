@@ -81,10 +81,18 @@ For filtering gists based on gist description, use option `--desc-matches`:
 
 ## Putting directory to disk
 
+For putting a **file** to a [disk](#show-disk-command), run:
+
+```sh
+./builds/backup put --file=/path-to/backup.zip --disk=dropbox
+```
+
+-   It will upload to specified disk, on the root of disk. Unless [specify destination path](#specifying-destination-path).
+
 For putting a **directory** to a [disk](#show-disk-command), run:
 
 ```sh
-./builds/backup put --dir=/path/upload-dir --disk=disk-name
+./builds/backup put --dir=/path/upload-dir --disk=dropbox
 ```
 
 -   It will upload to specified disk, with path `upload-dir/`(passed directory name). Unless [specify destination path](#specifying-destination-path).
@@ -110,15 +118,20 @@ If directory that you're uploading already exists in the specfied disk, then som
 -   upload remained things
     -   uploads files, and directories that aren't exists.
 
+> when using `replace directory` option, directory which is on the disk, will be moved to `uniqueid.tmp`, then
+when upload has finished, the tmp directory will be removed.
+
 ### Specifying destination path
 
-By default your directory will be upload to path `passed-directory-name/`. If you want to specfiy custom path that your folder will be upload there, use `--to-dir`
+By default your directory will be upload to directory of `--dir` option.
+Or if it's uploading file, it will be upload to the root of disk.
+If you want to specfiy custom path that your folder\file will be upload there, use `--to-dir`
 
 ```sh
-./builds/backup put --dir=/dir/path --to-dir=some/custom/path
+./builds/backup put ... --to-dir=some/path
 ```
 
-Now it will upload to disk path of: `some/custom/path/`.
+Now it will be upload to directory of: `some/path/`.
 
 ### Disk Tokens
 

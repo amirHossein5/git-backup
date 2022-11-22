@@ -5,7 +5,6 @@ namespace App\Commands\Gist;
 use App\Services\GistService;
 use App\Services\JsonDecoder;
 use App\Traits\HasForcedOptions;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Http;
 use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Command\Command as Output;
@@ -87,6 +86,7 @@ class GetCommand extends Command
                     str($gist['description'])->contains($this->option('desc-matches'))
                 )->toArray();
 
+
                 foreach ($response as $gistJson) {
                     $this->backupGist($gistJson);
                     $proceededGists ++;
@@ -132,9 +132,8 @@ class GetCommand extends Command
         $gistDirName = $description ? str("{$description}_{$id}")->slug() : $id;
 
         $allGistsDirPath = str(pathable("{$this->toDir}/{$allGistsDirName}"))->rtrim(DIRECTORY_SEPARATOR);
-        ;
         $gistDirPath = str(pathable("{$allGistsDirPath}/{$gistDirName}"))->rtrim(DIRECTORY_SEPARATOR);
-        ;
+
         $gistIndicator = $description ?? $id;
 
         if (! is_dir($allGistsDirPath)) {
