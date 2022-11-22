@@ -6,6 +6,7 @@ use App\Services\FileManager;
 use App\Services\JsonDecoder;
 use App\Services\RepositoryManager;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use LaravelZero\Framework\Testing\TestCase as BaseTestCase;
 
@@ -93,5 +94,32 @@ abstract class TestCase extends BaseTestCase
                 expect(sha1($content))->toBe(sha1(file_get_contents($filePath)));
             }
         }
+    }
+
+    protected function getServersJson($servers): string
+    {
+        $servers = ['servers' => [Arr::undot($servers)]];
+
+        return json_encode($servers);
+    }
+
+    protected function getLongFileName(bool $overlapTerminalWidth = true, int $charLenght = 0): string
+    {
+        $generatedName = '';
+        if ($overlapTerminalWidth) {
+            $terminalWidth = (new \Termwind\Terminal())->width();
+
+            for ($i=0; $i < $terminalWidth + 3; $i++) {
+                $generatedName .= rand(0, 9);
+            }
+
+            return $generatedName;
+        }
+
+        for ($i=0; $i < $charLenght; $i++) {
+            $generatedName .= rand(0, 9);
+        }
+
+        return $generatedName;
     }
 }

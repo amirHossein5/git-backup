@@ -81,7 +81,7 @@ class GetCommand extends Command
                 "<comment>{$data['name']}</comment>"
             );
 
-            $repoNames = $this->getRepoNames($data['repo-names']);
+            $repoNames = $this->getRepoNames($data['repoNames']);
 
             if ($repoMatches = $this->option('repo-matches')) {
                 $repoNames = collect($repoNames)
@@ -178,14 +178,17 @@ class GetCommand extends Command
         }
 
         try {
-            $repoNames = RepositoryManager::getRepoNamesFromApi(
-                url: $data['from-api'],
-                token: $data['token'],
-                pattern: $data['pattern'],
-            );
+            $repoNames = collect();
+            foreach ($data['fromApi']['urls'] as $url) {
+                $repoNames->push(RepositoryManager::getPatternFromApi(
+                    url: $url,
+                    token: $data['token'],
+                    pattern: $data['pattern'],
+                ));
+            }
+            $repoNames = $repoNames->flatten();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
-
             return false;
         }
 
