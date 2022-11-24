@@ -92,7 +92,8 @@ function readable_size($size): string
  * @param  string $path
  * @return string
  */
-function resolvehome(string $path): string {
+function resolvehome(string $path): string
+{
     if (! str($path)->startsWith('~')) {
         return $path;
     }
