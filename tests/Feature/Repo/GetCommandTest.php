@@ -348,9 +348,10 @@ it('filters repos', function () {
         ->assertExitCode(Command::SUCCESS);
 });
 
-it('gets filtered repo', function () {
+it('gets filtered repo and recognizes ~ as home directory in clone.to', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp1/config.json');
     $to = base_path(pathable('tests/temp'));
+    $toDir = str($to)->replaceFirst($_SERVER['HOME'], '~');
 
     Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
     {
@@ -358,7 +359,7 @@ it('gets filtered repo', function () {
             {
                 "name": "some name",
                 "clone": {
-                    "to": "{$to}",
+                    "to": "{$toDir}",
                     "using": "https://github.com/amirhossein5/<repo>"
                 },
                 "repoNames": {

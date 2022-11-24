@@ -49,7 +49,6 @@ class GetCommand extends Command
 
         if (! file_exists($configPath)) {
             $this->error("Counld'nt find config file in path: " . $configPath);
-
             return Output::FAILURE;
         }
 
@@ -70,7 +69,6 @@ class GetCommand extends Command
 
         if (count($config->servers()) === 0) {
             $this->error('No server found!');
-
             return Output::FAILURE;
         }
 
@@ -98,7 +96,7 @@ class GetCommand extends Command
 
             $this->info("<comment>{$reposCount}</comment> repository found. Cloning/Fetching...");
 
-            $cloneTo = pathable($data['clone']['to']);
+            $cloneTo = pathable(resolvehome($data['clone']['to']));
             $summaryMessages[] = '';
             $summaryMessages[] = "name: <comment>{$data['name']}</comment>";
             $summaryMessages[] = "found repos count: <comment>{$reposCount}</comment>";
@@ -108,7 +106,6 @@ class GetCommand extends Command
 
             if (! is_dir($cloneTo)) {
                 $this->error('Directory not found: ' . $cloneTo);
-
                 continue;
             }
 

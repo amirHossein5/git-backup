@@ -86,3 +86,26 @@ function readable_size($size): string
         return "{$size_mb} MB";
     }
 }
+
+/**
+ * If the given path contains ~ replaces it with user home directory.
+ * @param  string $path
+ * @return string
+ */
+function resolvehome(string $path): string {
+    if (! str($path)->startsWith('~')) {
+        return $path;
+    }
+
+    $home = null;
+
+    if (isset($_SERVER['HOME'])) {
+        $home = $_SERVER['HOME'];
+    }
+
+    if ($home) {
+        return str($path)->replaceFirst('~', $home);
+    }
+
+    return $path;
+}

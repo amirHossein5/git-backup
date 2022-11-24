@@ -147,3 +147,41 @@ test('adds keys to array, with vars', function () {
 
     expect($config)->toMatchArray($this->expectedFinalOutput);
 });
+
+it('resolves ~ as home directory in use.from', function () {
+    $usePath = Storage::disk('local')->path('tests/temp/config.json');
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        name: -serverName-
+        clone: {
+            to: -clone.to-
+            using: -clone.using-
+        }
+    }
+    EOL);
+
+    $usePath = str($usePath)->replaceFirst($_SERVER['HOME'], '~');
+
+    $config = ConfigReader::read(<<<EOL
+    {
+        servers: [
+            {
+                use: {
+                    from: $usePath
+                    with: {
+                        serverName: some name
+                        clone.to: some path
+                        clone.using: git c
+                    }
+                },
+                repoNames: {
+                    names: a repo name
+                }
+            }
+        ]
+    }
+    EOL)->getConfig();
+
+    expect($config)->toMatchArray($this->expectedFinalOutput);
+});

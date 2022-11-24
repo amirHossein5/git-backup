@@ -1,5 +1,15 @@
 # Release Notes
 
+## v0.3.3
+
+### Fixed
+
+-   Fix being unable to resolve `~` as home directory in `clone.to` and `use.from` in `repo:get` command config.
+
+## v0.3.2
+
+Fix filtering gists.
+
 ## v0.3.0
 
 ### Changed

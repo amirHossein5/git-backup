@@ -23,7 +23,7 @@ class JsonDecoder
 
     public static function decodePath(string $path): array
     {
-        $path = pathable($path);
+        $path = pathable(resolvehome($path));
 
         if (is_dir($path)) {
             throw new \Exception("expected json found directory: {$path}");
