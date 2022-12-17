@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Change defining variable names for `use.with` from begin inside of `-` to `<`varname`>`
+- Change defining variable names for `use.with` from being inside of `-` to `<`varname`>`
 
 ## v0.3.3
 
