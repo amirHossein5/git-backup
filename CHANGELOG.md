@@ -1,5 +1,11 @@
 # Release Notes
 
+## v0.4.0
+
+### Changed
+
+- Change defining variable names for `use.with` from begin inside of `-` to `<`varname`>`
+
 ## v0.3.3
 
 ### Fixed

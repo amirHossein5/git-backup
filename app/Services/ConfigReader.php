@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\RequiredKeyMissing;
-use App\Services\RepositoryManager;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 
 class ConfigReader
 {
@@ -102,7 +100,7 @@ class ConfigReader
                     fn ($val, $key) => [str_replace($varKey . '.', '', $key) => $val]
                 )->toArray();
 
-                $decodedUse = self::resolveVars(with: $vars, in: $decodedUse);
+                $decodedUse = self::resolveVars(with: $vars, in: $decodedUse, varStart: '<', varEnd: '>');
             }
 
             foreach ($decodedUse as $key => $value) {

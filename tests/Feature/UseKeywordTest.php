@@ -117,10 +117,10 @@ test('adds keys to array, with vars', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        name: -serverName-
+        name: <serverName>
         clone: {
-            to: -clone.to-
-            using: -clone.using-
+            to: <clone.to>
+            using: <clone.using>
         }
     }
     EOL);
@@ -153,10 +153,10 @@ it('resolves ~ as home directory in use.from', function () {
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
-        name: -serverName-
+        name: <serverName>
         clone: {
-            to: -clone.to-
-            using: -clone.using-
+            to: <clone.to>
+            using: <clone.using>
         }
     }
     EOL);

@@ -2,8 +2,6 @@
 
 use App\Services\FileManager;
 use App\Services\GistService;
-use App\Services\JsonDecoder;
-use App\Services\RepositoryManager;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\Console\Command\Command;

@@ -63,8 +63,8 @@ gists config which contains `username`, `token`:
 
 ```hjson
 {
-    username: "amirHossein5",
-    token: "optional"
+    username: amirHossein5
+    token: optional
 }
 ```
 
@@ -109,9 +109,9 @@ e.g, json file for dropbox:
 
 ```hjson
 {
-    "key": "app key",
-    "secret": "app secret",
-    "authorization_token": "app authorization token"
+    key: app key
+    secret: app secret
+    authorization_token: app authorization token
 }
 ```
 
@@ -179,7 +179,7 @@ The base of servers configuration json file:
 
 ```hjson
 {
-    "servers": [
+    servers: [
         ...
     ]
 }
@@ -189,15 +189,15 @@ Each server needs a name, a path that repos be clone there, git clone command, r
 
 ```hjson
 {
-    "servers": [
+    servers: [
         {
-            "name": "some server name",
-            "clone": {
-                "to": "/clone/here",
-                "using": "git@github.com:/amirhossein5/<repo>"
+            name: some server name
+            clone: {
+                to: /clone/here
+                using: git@github.com:/amirhossein5/<repo>
             },
-            "repoNames": {
-                "names": ["reponame", "anothername"]
+            repoNames: {
+                names: ["reponame", "anothername"]
             }
         }
     ]
@@ -212,15 +212,15 @@ Each server needs a name, a path that repos be clone there, git clone command, r
 If you are using github easily [use](#use-keyword):
 
 ```diff
-"repoNames": {
--   "names": ["reponame", "anothername"]
-+   "use": {
-+       "from": "pathto/git-backup/stubs/repo-names.github.json",
-+       "with": {
-+           "username": "your-github-username"
+repoNames: {
+-   names: ["reponame", "anothername"]
++   use: {
++       from: pathto/git-backup/stubs/repo-names.github.json
++       with: {
++           username: your-github-username
 +       }
 +   },
-+   "token": "if has token"
++   token: if has token
 }
 ```
 
@@ -229,11 +229,11 @@ If you are using github easily [use](#use-keyword):
 For getting repository names from api, you can define a api url, with a pattern to get repository names from response of api:
 
 ```diff
-"repoNames": {
--   "names": ["reponame", "anothername"]
-+   "fromApi": "https://api.github.com/search/repositories?q=user:yourusername",
-+   "pattern": "items.*.name",
-+   "token": "if has token"
+repoNames: {
+-   names: ["reponame", "anothername"]
++   fromApi: https://api.github.com/search/repositories?q=user:yourusername
++   pattern: items.*.name
++   token: if has token
 }
 ```
 
@@ -252,10 +252,10 @@ For getting repository names from api, you can define a api url, with a pattern 
 Sometimes the api url has pagination, for that you can expand `fromApi` like this:
 
 ```hjson
-"repoNames": {
+repoNames: {
     fromApi:  {
-        url: "https://someurl.com/?per_page=50",
-        withPagination: true,
+        url: https://someurl.com/?per_page=50
+        withPagination: true
         total: 100
         perPage: 50
     }
@@ -266,11 +266,11 @@ Sometimes the api url has pagination, for that you can expand `fromApi` like thi
 
 ```diff
 fromApi:  {
-    url: "https://someurl.com/?per_page=50",
-    withPagination: true,
+    url: https://someurl.com/?per_page=50
+    withPagination: true
 -   total: 100
-+   total: "https://api.github.com/search/repositories?q=user:amirHossein5",
-+   totalKey: "total_count"
++   total: https://api.github.com/search/repositories?q=user:amirHossein5
++   totalKey: total_count
     perPage: 50
 }
 ```
@@ -281,9 +281,9 @@ By default the query string for pages(`?page=2`) is `page` for customizing that 
 
 ```diff
 fromApi:  {
-    url: "https://someurl.com/?per_page=50",
+    url: https://someurl.com/?per_page=50
     withPagination: true,
-+   pageQueryString: "pg",
++   pageQueryString: pg
 //...
 ```
 
@@ -299,8 +299,8 @@ for example if you `use` in config file:
 {
     // ...
     {
-        "name": "some name",
-        "use": "path/to/file.hjson"
+        name: some name
+        use: path/to/file.hjson
     }
 }
 ```
@@ -309,11 +309,11 @@ e.g, file `path/to/file.hjson`:
 
 ```hjson
 {
-    "name": "new",
-    "example": "new example",
-    "another": {
-        "first": "first",
-        "second": "second"
+    name: new
+    example: new example
+    another: {
+        first: first
+        second: second
     }
 }
 ```
@@ -324,11 +324,11 @@ config file will be render to:
 {
     // ...
     {
-        "name": "some name",
-        "example": "new example",
-        "another": {
-            "first": "first",
-            "second": "second"
+        name: some name
+        example: new example
+        another: {
+            first: first
+            second: second
         }
     }
 }
@@ -336,15 +336,15 @@ config file will be render to:
 
 ### Using variables with `use`
 
-Define variables value in `use.with`, and write variabe name `-`inside`-`. For example:
+Define variables value in `use.with`, and write variabe name `<`inside`>`. For example:
 
 file `path/to/file.hjson`:
 
 ```hjson
 {
-    "clone": {
-        "to": "-clone.to-",
-        "using": "-cloneUsing-"
+    clone: {
+        to: <clone.to>
+        using: <cloneUsing>
     }
 }
 ```
@@ -355,11 +355,11 @@ config file:
 {
     // ...
     {
-        "use": {
-            "from": "path/to/file.hjson",
-            "with": {
-                "clone.to": "clone/here",
-                "cloneUsing": "git@github.com:/amirhossein5/<repo>"
+        use: {
+            from: path/to/file.hjson
+            with: {
+                clone.to: clone/here
+                cloneUsing: git@github.com:/amirhossein5/<repo>
             }
         }
     }
@@ -372,9 +372,9 @@ config file will be render to:
 {
     // ...
     {
-        "clone": {
-            "to": "clone/here",
-            "using": "git@github.com:/amirhossein5/<repo>"
+        clone: {
+            to: clone/here
+            using: git@github.com:/amirhossein5/<repo>
         }
     }
 }
