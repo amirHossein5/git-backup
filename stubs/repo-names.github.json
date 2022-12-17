@@ -1,6 +1,6 @@
 {
     "fromApi":  {
-		url: "https://api.github.com/search/repositories?q=user:-username-&per_page=50",
+		url: "https://api.github.com/search/repositories?q=user:<username>&per_page=50",
 		withPagination: true,
 		total: "https://api.github.com/search/repositories?q=user:<username>",
 		totalKey: "total_count"
