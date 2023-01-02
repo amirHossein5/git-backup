@@ -272,7 +272,7 @@ repoNames: {
 }
 ```
 
-`total` also can be get from api too:
+`total` also can be get dynamically from api too:
 
 ```diff
 fromApi:  {
@@ -287,27 +287,25 @@ fromApi:  {
 
 `totalKey` stands for key of response json which has total.
 
-By default the query string for pages(`?page=2`) is `page` for customizing that pass `pageQueryString`:
+By default the query string for pages(`?page=1`) is `page` for customizing that pass `pageQueryString`:
 
 ```diff
 fromApi:  {
     url: https://someurl.com/?per_page=50
     withPagination: true,
-+   pageQueryString: pg
-//...
++   pageQueryString: page
 ```
 
 ## `use` keyword
 
 `use` keyword is only available in `repo:get` command config file.
 
-The `use` keyword is for including json keys inside current json file(keys won't be overriten).
+The `use` keyword is for including json inside another json file(values won't be overriten).
 
 for example if you `use` in config file:
 
 ```hjson
 {
-    //...
     name: some name
     use: path/to/file.hjson
 }
@@ -341,7 +339,7 @@ config file will be render to:
 
 ### Using variables with `use`
 
-Define variables value in `use.with`, and write variabe name `<`inside`>`. For example:
+Define variables values in `use.with`, and write variabe name `<`inside`>`. For example:
 
 config file:
 
@@ -366,6 +364,7 @@ file `path/to/file.hjson`:
         to: <clone.to>
         using: <cloneUsing>
     }
+    some: otherthings
 }
 ```
 
@@ -373,11 +372,11 @@ config file will be render to:
 
 ```hjson
 {
-    //...
     clone: {
         to: clone/here
         using: git@github.com:/amirhossein5/<repo>
     }
+    some: otherthings
 }
 ```
 
