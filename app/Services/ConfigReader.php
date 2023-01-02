@@ -31,6 +31,7 @@ class ConfigReader
     {
         $decodedJson = JsonDecoder::decode($jsonContent);
         $decodedJson = self::resolveUse($decodedJson);
+        $decodedJson = static::wrapServers($decodedJson);
 
         collect(self::$requiredKeys)->each(function ($forceKey) use ($decodedJson) {
             self::throwExceptionIfKeyDoesNotExist($decodedJson, $forceKey, count($decodedJson['servers']));
@@ -68,6 +69,19 @@ class ConfigReader
     public function setServers(array $servers): void
     {
         $this->config['servers'] = $servers;
+    }
+
+    /**
+     * Wraps config into servers key if it's missing.
+     *
+     * @param  array  $decodedJson
+     * @return array
+     */
+    private static function wrapServers(array $decodedJson): array
+    {
+        return isset($decodedJson['servers'])
+            ? $decodedJson
+            : ['servers' => [$decodedJson]];
     }
 
     private static function resolveUse(array $decodedJson)

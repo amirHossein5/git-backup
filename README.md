@@ -173,25 +173,36 @@ For seeing available disks run:
 
 Config files are in json or also, [hjson](https://github.com/hjson/hjson-php) is supported.
 
-## Configuring Servers
+## Configuring a server
 
-The base of servers configuration json file:
+Each server should provide a name, a path that repos be clone there, git clone command, and repo names. So:
 
 ```hjson
 {
-    servers: [
-        ...
-    ]
+    name: some name
+    clone: {
+        to: /clone/here
+        using: git@github.com:/amirhossein5/<repo>
+    },
+    repoNames: {
+        names: ["reponame", "anothername"]
+    }
 }
 ```
 
-Each server needs a name, a path that repos be clone there, git clone command, repo names. So:
+-   For configuring `repoNames` dynamically [see](#getting-repo-names-from-api).
+-   `clone.using` will be concat to `git clone --mirror`.
+-   `<repo>` in `clone.using` stands for each repo name(will be resolve by program).
+
+## Configuring multiple servers
+
+Simply write each individual server indide of `servers`:
 
 ```hjson
 {
     servers: [
         {
-            name: some server name
+            name: some name
             clone: {
                 to: /clone/here
                 using: git@github.com:/amirhossein5/<repo>
@@ -199,13 +210,12 @@ Each server needs a name, a path that repos be clone there, git clone command, r
             repoNames: {
                 names: ["reponame", "anothername"]
             }
-        }
+        },
+        {...},
+        {...}
     ]
 }
 ```
-
--   `clone.using` will be concat to `git clone --mirror`.
--   `<repo>` in `clone.using` stands for each repo name(will be resolve by program).
 
 ## Getting repo names from api
 
@@ -291,17 +301,15 @@ fromApi:  {
 
 `use` keyword is only available in `repo:get` command config file.
 
-The `use` keyword is for including json keys inside current json file(keys won't be override).
+The `use` keyword is for including json keys inside current json file(keys won't be overriten).
 
 for example if you `use` in config file:
 
 ```hjson
 {
-    // ...
-    {
-        name: some name
-        use: path/to/file.hjson
-    }
+    //...
+    name: some name
+    use: path/to/file.hjson
 }
 ```
 
@@ -322,14 +330,11 @@ config file will be render to:
 
 ```hjson
 {
-    // ...
-    {
-        name: some name
-        example: new example
-        another: {
-            first: first
-            second: second
-        }
+    name: some name
+    example: new example
+    another: {
+        first: first
+        second: second
     }
 }
 ```
@@ -337,6 +342,21 @@ config file will be render to:
 ### Using variables with `use`
 
 Define variables value in `use.with`, and write variabe name `<`inside`>`. For example:
+
+config file:
+
+```hjson
+{
+    //...
+    use: {
+        from: path/to/file.hjson
+        with: {
+            clone.to: clone/here
+            cloneUsing: git@github.com:/amirhossein5/<repo>
+        }
+    }
+}
+```
 
 file `path/to/file.hjson`:
 
@@ -349,33 +369,14 @@ file `path/to/file.hjson`:
 }
 ```
 
-config file:
-
-```hjson
-{
-    // ...
-    {
-        use: {
-            from: path/to/file.hjson
-            with: {
-                clone.to: clone/here
-                cloneUsing: git@github.com:/amirhossein5/<repo>
-            }
-        }
-    }
-}
-```
-
 config file will be render to:
 
 ```hjson
 {
-    // ...
-    {
-        clone: {
-            to: clone/here
-            using: git@github.com:/amirhossein5/<repo>
-        }
+    //...
+    clone: {
+        to: clone/here
+        using: git@github.com:/amirhossein5/<repo>
     }
 }
 ```

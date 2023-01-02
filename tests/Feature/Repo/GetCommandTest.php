@@ -21,17 +21,7 @@ it('shows error if config file not found', function () {
 });
 
 it('shows error if cannot decode config', function () {
-    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
-    {
-        // some valid hjson config
-    }
-    EOL);
-
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
-
-    $this->artisan('repo:get --config ' . $pathToConfig)
-        ->expectsOutput('Undefined array key "servers"')
-        ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
     {
@@ -55,7 +45,7 @@ it('shows error if required config key missing', function () {
     $pathToConfig = Storage::disk('local')->path('tests/temp/config.json');
 
     $this->artisan('repo:get --config ' . $pathToConfig)
-        ->expectsOutput('Undefined array key "servers"')
+        ->expectsOutput('required config key servers.*.name missing.')
         ->assertExitCode(Command::FAILURE);
 
     Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
@@ -63,6 +53,20 @@ it('shows error if required config key missing', function () {
         servers: [
             {
 
+            }
+        ]
+    }
+    EOL);
+
+    $this->artisan('repo:get --config ' . $pathToConfig)
+        ->expectsOutput('required config key servers.*.name missing.')
+        ->assertExitCode(Command::FAILURE);
+
+    Storage::disk('local')->put('tests/temp/config.json', <<<'EOL'
+    {
+        servers: [
+            {
+                name: "",
             }
         ]
     }
@@ -227,6 +231,39 @@ it('shows error if required config key missing', function () {
         ->expectsOutput('found repos count: 2')
         ->expectsOutput('path to repos: ' . pathable('/some/path'))
         ->assertExitCode(Command::SUCCESS);
+});
+
+it('wraps config into servers key', function () {
+    $pathToConfig = Storage::disk('local')->path('tests/temp1/config.json');
+    $to = base_path(pathable('tests/temp'));
+
+    Storage::disk('local')->put('tests/temp1/config.json', <<<EOL
+    {
+        "name": "some name",
+        "clone": {
+            "to": "{$to}",
+            "using": "https://github.com/amirhossein5/<repo>"
+        },
+        "repoNames": {
+            "names": [
+                "full-screen-js-codes.git"
+            ]
+        }
+    }
+    EOL);
+
+    expect(Artisan::call('repo:get --config ' . $pathToConfig))
+        ->toBe(Command::SUCCESS);
+    expect(count(FileManager::allDir($to)))
+        ->toBe(1);
+    expect(count(FileManager::allFiles($to)))
+        ->toBe(0);
+
+    expect(FileManager::allDir($to)[0])->toContain('full-screen-js-codes.git');
+
+    expect(count(RepositoryManager::getClonedReposTo()))->toBe(1);
+    expect(count(RepositoryManager::getFetchedRepos()))->toBe(0);
+    expect(RepositoryManager::getClonedReposTo()[0])->toContain($to);
 });
 
 it('skips server when clone.to directory not found', function () {
