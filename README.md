@@ -169,9 +169,9 @@ For seeing available disks run:
 ./builds/backup show:disk
 ```
 
-## Configuration
+# Configuration
 
-Config files are in json or also, [hjson](https://github.com/hjson/hjson-php) is supported.
+Config files are in json. Also, [hjson](https://github.com/hjson/hjson-php) is supported.
 
 ## Configuring a server
 
