@@ -63,7 +63,7 @@ gists config which contains `username`, `token`:
 
 ```hjson
 {
-    username: amirHossein5
+    username: amirstr
     token: optional
 }
 ```
@@ -182,7 +182,7 @@ Each server should provide a name, a path that repos be clone there, git clone c
     name: some name
     clone: {
         to: /clone/here
-        using: git@github.com:/amirhossein5/<repo>
+        using: git@github.com:/amirstr/<repo>
     },
     repoNames: {
         names: ["reponame", "anothername"]
@@ -205,7 +205,7 @@ Simply write each individual server indide of `servers`:
             name: some name
             clone: {
                 to: /clone/here
-                using: git@github.com:/amirhossein5/<repo>
+                using: git@github.com:/amirstr/<repo>
             },
             repoNames: {
                 names: ["reponame", "anothername"]
@@ -279,7 +279,7 @@ fromApi:  {
     url: https://someurl.com/?per_page=50
     withPagination: true
 -   total: 100
-+   total: https://api.github.com/search/repositories?q=user:amirHossein5
++   total: https://api.github.com/search/repositories?q=user:amirstr
 +   totalKey: total_count
     perPage: 50
 }
@@ -350,7 +350,7 @@ config file:
         from: path/to/file.hjson
         with: {
             clone.to: clone/here
-            cloneUsing: git@github.com:/amirhossein5/<repo>
+            cloneUsing: git@github.com:/amirstr/<repo>
         }
     }
 }
@@ -374,7 +374,7 @@ config file will be render to:
 {
     clone: {
         to: clone/here
-        using: git@github.com:/amirhossein5/<repo>
+        using: git@github.com:/amirstr/<repo>
     }
     some: otherthings
 }
@@ -382,4 +382,4 @@ config file will be render to:
 
 ## License
 
-[Licence](https://github.com/amirHossein5/git-backup/blob/main/LICENCE);
+[Licence](https://github.com/amirstr/git-backup/blob/main/LICENCE);
