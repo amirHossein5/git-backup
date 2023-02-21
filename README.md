@@ -11,7 +11,7 @@ Currently available disk: dropbox.
 Clone the repo:
 
 ```sh
-git clone https://github.com/amirHossein5/git-backup.git
+git clone https://github.com/amirstr/git-backup.git
 
 cd git-backup
 ```
