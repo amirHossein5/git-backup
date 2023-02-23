@@ -11,7 +11,7 @@ Currently available disk: dropbox.
 Clone the repo:
 
 ```sh
-git clone https://github.com/amirstr/git-backup.git
+git clone https://github.com/amirHossein5/git-backup.git
 
 cd git-backup
 ```
@@ -63,7 +63,7 @@ gists config which contains `username`, `token`:
 
 ```hjson
 {
-    username: amirstr
+    username: amirHossein5
     token: optional
 }
 ```
@@ -182,7 +182,7 @@ Each server should provide a name, a path that repos be clone there, git clone c
     name: some name
     clone: {
         to: /clone/here
-        using: git@github.com:/amirstr/<repo>
+        using: git@github.com:/amirHossein5/<repo>
     },
     repoNames: {
         names: ["reponame", "anothername"]
@@ -205,7 +205,7 @@ Simply write each individual server indide of `servers`:
             name: some name
             clone: {
                 to: /clone/here
-                using: git@github.com:/amirstr/<repo>
+                using: git@github.com:/amirHossein5/<repo>
             },
             repoNames: {
                 names: ["reponame", "anothername"]
@@ -279,7 +279,7 @@ fromApi:  {
     url: https://someurl.com/?per_page=50
     withPagination: true
 -   total: 100
-+   total: https://api.github.com/search/repositories?q=user:amirstr
++   total: https://api.github.com/search/repositories?q=user:amirHossein5
 +   totalKey: total_count
     perPage: 50
 }
@@ -350,7 +350,7 @@ config file:
         from: path/to/file.hjson
         with: {
             clone.to: clone/here
-            cloneUsing: git@github.com:/amirstr/<repo>
+            cloneUsing: git@github.com:/amirHossein5/<repo>
         }
     }
 }
@@ -374,7 +374,7 @@ config file will be render to:
 {
     clone: {
         to: clone/here
-        using: git@github.com:/amirstr/<repo>
+        using: git@github.com:/amirHossein5/<repo>
     }
     some: otherthings
 }
@@ -382,4 +382,4 @@ config file will be render to:
 
 ## License
 
-[Licence](https://github.com/amirstr/git-backup/blob/main/LICENCE);
+[Licence](https://github.com/amirHossein5/git-backup/blob/main/LICENCE);
